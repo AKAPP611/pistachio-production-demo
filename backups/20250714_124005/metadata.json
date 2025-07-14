@@ -1,0 +1,19 @@
+{
+  "backupDate": "2025-07-14T12:40:06Z",
+  "backupType": "incremental",
+  "version": "2.0.0",
+  "git": {
+    "commit": "48ab8eb7e2e772b9969c15b444d3b7d0b5ebbcdb",
+    "branch": "main",
+    "author": "AKAPP611 <AKAPP611@users.noreply.github.com>",
+    "date": "2025-07-14 16:39:55 +0400"
+  },
+  "statistics": {
+    "productionsCount": 1,
+    "materialsCount": 6,
+    "totalFiles": 2
+  },
+  "files": [
+    "data/productions.json","data/materials.json"
+  ]
+}
