@@ -1234,5 +1234,208 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 </script>
+       <!-- Add this script right before </body> in your index.html -->
+<script>
+// Personal Access Token Workaround for GitHub Pages
+document.addEventListener('DOMContentLoaded', () => {
+    // Add PAT login option to the login screen
+    const loginContent = document.getElementById('loginContent');
+    if (loginContent) {
+        // Create PAT login section
+        const patSection = document.createElement('div');
+        patSection.style.cssText = 'margin-top: 30px; padding: 20px; background-color: #e3f2fd; border-radius: 8px; border-left: 4px solid #2196f3;';
+        patSection.innerHTML = `
+            <h4 style="margin: 0 0 15px 0; color: #1976d2;">Alternative: Personal Access Token</h4>
+            <p style="margin: 0 0 15px 0; font-size: 14px; color: #666;">
+                For immediate access, you can use a GitHub Personal Access Token:
+            </p>
+            <ol style="font-size: 14px; color: #666; margin: 0 0 15px 0; padding-left: 20px;">
+                <li>Go to <a href="https://github.com/settings/tokens" target="_blank">GitHub Settings → Personal Access Tokens</a></li>
+                <li>Click "Generate new token (classic)"</li>
+                <li>Select scope: <strong>repo</strong></li>
+                <li>Copy the generated token</li>
+                <li>Click the button below and paste it</li>
+            </ol>
+            <button id="patLoginBtn" style="width: 100%; padding: 12px; background: #1976d2; color: white; border: none; border-radius: 6px; font-weight: 600;">
+                🔑 Login with Personal Access Token
+            </button>
+        `;
+        
+        loginContent.appendChild(patSection);
+        
+        // Add click handler for PAT login
+        document.getElementById('patLoginBtn').addEventListener('click', handlePATLogin);
+    }
+    
+    // Auto-restore PAT session if available
+    const storedToken = localStorage.getItem('github_access_token');
+    if (storedToken && storedToken.startsWith('ghp_')) {
+        console.log('Found stored PAT, attempting to restore session...');
+        authenticateWithPAT(storedToken);
+    }
+});
+
+async function handlePATLogin() {
+    const token = prompt(`Enter your GitHub Personal Access Token:
+
+Instructions:
+1. Go to: https://github.com/settings/tokens
+2. Click "Generate new token (classic)"
+3. Select scope: repo
+4. Copy the token and paste it here
+
+Token format: ghp_xxxxxxxxxxxx`);
+    
+    if (token) {
+        if (!token.startsWith('ghp_')) {
+            alert('Invalid token format. Personal Access Tokens start with "ghp_"');
+            return;
+        }
+        
+        await authenticateWithPAT(token);
+    }
+}
+
+async function authenticateWithPAT(token) {
+    try {
+        // Show loading state
+        const loginContent = document.getElementById('loginContent');
+        const loadingContent = document.getElementById('loadingContent');
+        
+        if (loginContent) loginContent.style.display = 'none';
+        if (loadingContent) {
+            loadingContent.style.display = 'block';
+            loadingContent.innerHTML = `
+                <div style="display: flex; align-items: center; justify-content: center; gap: 15px; padding: 30px;">
+                    <div class="sync-indicator syncing" style="width: 12px; height: 12px;"></div>
+                    <span>Authenticating with Personal Access Token...</span>
+                </div>
+            `;
+        }
+        
+        // Test the token by fetching user info
+        const response = await fetch('https://api.github.com/user', {
+            headers: {
+                'Authorization': `token ${token}`,
+                'Accept': 'application/vnd.github.v3+json',
+                'User-Agent': 'Pistachio-Production-App/2.0.0'
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`GitHub API error: ${response.status} ${response.statusText}`);
+        }
+        
+        const user = await response.json();
+        
+        // Test repository access
+        const repoResponse = await fetch(`https://api.github.com/repos/${window.Config.github.repo}`, {
+            headers: {
+                'Authorization': `token ${token}`,
+                'Accept': 'application/vnd.github.v3+json',
+                'User-Agent': 'Pistachio-Production-App/2.0.0'
+            }
+        });
+        
+        user.hasRepoAccess = repoResponse.ok;
+        
+        // Store authentication data
+        window.GitHubAuth.accessToken = token;
+        window.GitHubAuth.currentUser = user;
+        window.GitHubAuth.storeToken(token);
+        window.GitHubAuth.storeUser(user);
+        
+        // Initialize storage and offline manager
+        if (window.GitHubStorage && typeof window.GitHubStorage.init === 'function') {
+            await window.GitHubStorage.init();
+        }
+        
+        if (window.OfflineManager && typeof window.OfflineManager.init === 'function') {
+            await window.OfflineManager.init();
+        }
+        
+        // Show main app
+        window.GitHubAuth.showMainApp();
+        
+        // Initialize enhanced app features
+        if (typeof window.initializeApp === 'function') {
+            window.initializeApp();
+        }
+        
+        console.log(`✅ Successfully authenticated as: ${user.login}`);
+        console.log(`📁 Repository access: ${user.hasRepoAccess ? 'Yes' : 'No'}`);
+        
+        // Show success message briefly
+        if (loadingContent) {
+            loadingContent.innerHTML = `
+                <div style="display: flex; align-items: center; justify-content: center; gap: 15px; padding: 30px;">
+                    <div style="width: 12px; height: 12px; border-radius: 50%; background-color: #4CAF50;"></div>
+                    <span>✅ Authentication successful!</span>
+                </div>
+            `;
+            
+            setTimeout(() => {
+                window.GitHubAuth.showMainApp();
+            }, 1500);
+        }
+        
+    } catch (error) {
+        console.error('PAT authentication failed:', error);
+        
+        // Show error
+        let errorMessage = 'Authentication failed';
+        if (error.message.includes('401')) {
+            errorMessage = 'Invalid token. Please check your Personal Access Token.';
+        } else if (error.message.includes('403')) {
+            errorMessage = 'Token lacks required permissions. Make sure "repo" scope is selected.';
+        } else {
+            errorMessage = error.message;
+        }
+        
+        // Reset to login screen
+        const loginContent = document.getElementById('loginContent');
+        const loadingContent = document.getElementById('loadingContent');
+        
+        if (loadingContent) loadingContent.style.display = 'none';
+        if (loginContent) {
+            loginContent.style.display = 'block';
+            
+            // Show error message
+            let errorDiv = document.getElementById('errorMessage');
+            if (!errorDiv) {
+                errorDiv = document.createElement('div');
+                errorDiv.id = 'errorMessage';
+                errorDiv.style.cssText = 'background: #f8d7da; color: #721c24; padding: 15px; border-radius: 8px; margin: 20px 0; border: 1px solid #f5c6cb;';
+                loginContent.appendChild(errorDiv);
+            }
+            errorDiv.innerHTML = `<strong>Authentication Error:</strong><br>${errorMessage}`;
+        }
+        
+        // Clear any stored invalid token
+        localStorage.removeItem('github_access_token');
+        localStorage.removeItem('github_user');
+    }
+}
+
+// Override the original GitHub login to show helpful message
+function handleGitHubLogin() {
+    alert(`OAuth Login requires a backend service for token exchange.
+
+For immediate access, please use the "Personal Access Token" option below.
+
+For production deployment, consider:
+• Setting up a token exchange proxy service
+• Using GitHub Apps instead of OAuth Apps
+• Using a backend service like Netlify Functions`);
+}
+
+// Update the existing login button
+document.addEventListener('DOMContentLoaded', () => {
+    const githubLoginBtn = document.getElementById('githubLoginBtn');
+    if (githubLoginBtn) {
+        githubLoginBtn.onclick = handleGitHubLogin;
+    }
+});
+</script>
 </body>
 </html>
