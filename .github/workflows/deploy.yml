@@ -183,17 +183,41 @@ jobs:
           # Create build directory
           mkdir -p _site
           
-          # Copy all necessary files to build directory
+          # Copy all necessary files to build directory (excluding _site itself)
           echo "Copying application files..."
-          cp -r . _site/
+          find . -maxdepth 1 -name "_site" -prune -o -name ".git" -prune -o -name ".github" -prune -o -type f -print0 | xargs -0 cp -t _site/
           
-          # Remove unnecessary files from build
-          cd _site
-          echo "Cleaning up build directory..."
-          rm -rf .git .github node_modules .gitignore README.md MIGRATION.md
+          # Copy directories we need (excluding problematic ones)
+          if [ -d "js" ]; then
+            echo "Copying js directory..."
+            cp -r js _site/
+          fi
           
-          # Remove any npm/node related files if they exist
-          rm -f package.json package-lock.json yarn.lock
+          if [ -d "data" ]; then
+            echo "Copying data directory..."
+            cp -r data _site/
+          fi
+          
+          if [ -d "css" ]; then
+            echo "Copying css directory..."
+            cp -r css _site/
+          fi
+          
+          if [ -d "images" ]; then
+            echo "Copying images directory..."
+            cp -r images _site/
+          fi
+          
+          if [ -d "icons" ]; then
+            echo "Copying icons directory..."
+            cp -r icons _site/
+          fi
+          
+          # Alternative method if the above doesn't work
+          if [ ! -f "_site/index.html" ]; then
+            echo "Using alternative copy method..."
+            rsync -av --exclude='_site' --exclude='.git' --exclude='.github' --exclude='node_modules' . _site/
+          fi
           
           echo "✅ Build completed successfully"
           
