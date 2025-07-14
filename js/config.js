@@ -6,10 +6,10 @@
 const Config = {
     // GitHub OAuth Configuration
     github: {
-        clientId: 'Iv1. Ov23lizH9QoqwmOf0JD8',              // Your OAuth , // 
+        clientId: 'Iv1.Ov23lizH9QoqwmOf0JD8',           // ← Removed extra space and fixed syntax
         redirectUri: window.location.origin + window.location.pathname,
         scopes: 'repo',
-        repo: 'AKAPP611/pistachio-production-demo', // Replace with your repository
+        repo: 'AKAPP611/pistachio-production-demo',     // ← This looks correct
         branch: 'main',
         apiUrl: 'https://api.github.com'
     },
