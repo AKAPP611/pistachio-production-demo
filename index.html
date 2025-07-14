@@ -1125,6 +1125,53 @@
 <script src="js/enhanced-app.js"></script>
 
 <script>
+// Initialize services when DOM is ready
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        console.log('Initializing GitHub services...');
+        
+        // Check if all required objects exist
+        if (typeof Config === 'undefined') {
+            throw new Error('Config not loaded');
+        }
+        
+        if (typeof GitHubAuth === 'undefined') {
+            throw new Error('GitHubAuth not loaded');
+        }
+        
+        // Initialize GitHubAuth
+        if (!window.GitHubAuth || typeof window.GitHubAuth.init !== 'function') {
+            console.log('Creating new GitHubAuth instance...');
+            window.GitHubAuth = new GitHubAuth();
+        }
+        
+        // Initialize auth
+        await window.GitHubAuth.init();
+        
+        console.log('GitHub services initialized successfully');
+        
+    } catch (error) {
+        console.error('Failed to initialize GitHub services:', error);
+        
+        // Fallback: Show error message
+        const loginScreen = document.getElementById('loginScreen');
+        if (loginScreen) {
+            loginScreen.innerHTML = `
+                <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #f5f5f5;">
+                    <div style="background: white; padding: 40px; border-radius: 8px; max-width: 500px; text-align: center;">
+                        <h2 style="color: #dc3545;">⚠️ Loading Error</h2>
+                        <p>Failed to load authentication system.</p>
+                        <p style="color: #666; font-size: 14px;">Error: ${error.message}</p>
+                        <button onclick="location.reload()" style="padding: 10px 20px; background: #2c7a2c; color: white; border: none; border-radius: 4px; margin-top: 20px;">
+                            Retry
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+    }
+});
+
 // Register service worker
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
