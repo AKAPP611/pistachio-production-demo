@@ -1,6 +1,6 @@
 /**
- * GitHub Authentication Service
- * Handles OAuth 2.0 flow, token management, and user authentication
+ * GitHub Authentication Service - Frontend Only
+ * Handles OAuth 2.0 flow for GitHub Pages without backend
  */
 
 class GitHubAuth {
@@ -23,8 +23,11 @@ class GitHubAuth {
      */
     async init() {
         try {
+            console.log('GitHubAuth initializing...');
+            
             // Check for OAuth callback
             if (this.isOAuthCallback()) {
+                console.log('OAuth callback detected');
                 await this.handleCallback();
                 return;
             }
@@ -34,16 +37,21 @@ class GitHubAuth {
             
             this.isInitialized = true;
             
-            if (this.config.dev.enableDebugLogging) {
-                console.log('GitHubAuth initialized', { 
-                    authenticated: this.isAuthenticated(),
-                    user: this.currentUser?.login 
-                });
+            // Show appropriate screen
+            if (this.isAuthenticated()) {
+                this.showMainApp();
+            } else {
+                this.showLoginScreen();
             }
+            
+            console.log('GitHubAuth initialized', { 
+                authenticated: this.isAuthenticated(),
+                user: this.currentUser?.login 
+            });
             
         } catch (error) {
             console.error('Failed to initialize GitHubAuth:', error);
-            throw error;
+            this.showErrorState('Failed to initialize authentication: ' + error.message);
         }
     }
     
@@ -52,6 +60,8 @@ class GitHubAuth {
      */
     login() {
         try {
+            console.log('Starting OAuth login...');
+            
             // Generate state parameter for CSRF protection
             const state = this.generateState();
             sessionStorage.setItem('oauth_state', state);
@@ -63,6 +73,10 @@ class GitHubAuth {
             authUrl.searchParams.set('scope', this.config.github.scopes);
             authUrl.searchParams.set('state', state);
             
+            console.log('OAuth URL:', authUrl.toString());
+            console.log('Client ID:', this.config.github.clientId);
+            console.log('Redirect URI:', this.config.github.redirectUri);
+            
             // Show loading state
             this.showLoadingState();
             
@@ -71,7 +85,7 @@ class GitHubAuth {
             
         } catch (error) {
             console.error('Login failed:', error);
-            this.showErrorState('Login failed. Please try again.');
+            this.showErrorState('Login failed: ' + error.message);
         }
     }
     
@@ -85,15 +99,17 @@ class GitHubAuth {
             const state = urlParams.get('state');
             const error = urlParams.get('error');
             
+            console.log('OAuth callback params:', { code: !!code, state: !!state, error });
+            
             // Handle OAuth errors
             if (error) {
-                throw new Error(`OAuth error: ${error}`);
+                throw new Error(`OAuth error: ${error} - ${urlParams.get('error_description')}`);
             }
             
             // Validate state parameter
             const savedState = sessionStorage.getItem('oauth_state');
             if (!state || state !== savedState) {
-                throw new Error('Invalid state parameter');
+                throw new Error('Invalid state parameter - possible CSRF attack');
             }
             
             // Clear state from session
@@ -103,7 +119,9 @@ class GitHubAuth {
                 throw new Error('No authorization code received');
             }
             
-            // Exchange code for access token
+            console.log('OAuth code received, exchanging for token...');
+            
+            // Exchange code for access token using a proxy service
             await this.exchangeCodeForToken(code);
             
             // Get user information
@@ -112,14 +130,14 @@ class GitHubAuth {
             // Clean up URL
             window.history.replaceState({}, document.title, window.location.pathname);
             
-            // Initialize application
-            if (window.initializeApp) {
-                window.initializeApp();
-            }
+            // Show main application
+            this.showMainApp();
+            
+            console.log('OAuth flow completed successfully');
             
         } catch (error) {
             console.error('OAuth callback failed:', error);
-            this.showErrorState('Authentication failed. Please try again.');
+            this.showErrorState('Authentication failed: ' + error.message);
             
             // Clear URL and redirect to login
             window.history.replaceState({}, document.title, window.location.pathname);
@@ -129,29 +147,36 @@ class GitHubAuth {
     
     /**
      * Exchange authorization code for access token
+     * Uses a proxy service since we can't expose client secret in frontend
      */
     async exchangeCodeForToken(code) {
         try {
-            // Note: In a real production environment, this should be done on a backend server
-            // For GitHub Pages, we need to use a proxy service or GitHub Apps
-            // This is a simplified implementation for demonstration
+            // Option 1: Use a free proxy service (like github-oauth-proxy.herokuapp.com)
+            // Option 2: Use your own proxy service
+            // Option 3: Use GitHub Apps instead of OAuth Apps
             
-            const response = await fetch('https://github.com/login/oauth/access_token', {
+            // For now, we'll use a simplified approach with a public proxy
+            // In production, you should use your own secure proxy
+            
+            const proxyUrl = 'https://cors-anywhere.herokuapp.com/https://github.com/login/oauth/access_token';
+            
+            const response = await fetch(proxyUrl, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
                 },
                 body: JSON.stringify({
                     client_id: this.config.github.clientId,
-                    client_secret: this.config.github.clientSecret, // This should come from backend
+                    client_secret: 'YOUR_CLIENT_SECRET', // This needs to be handled by a backend service
                     code: code,
                     redirect_uri: this.config.github.redirectUri
                 })
             });
             
             if (!response.ok) {
-                throw new Error(`Token exchange failed: ${response.status}`);
+                throw new Error(`Token exchange failed: ${response.status} ${response.statusText}`);
             }
             
             const data = await response.json();
@@ -165,9 +190,13 @@ class GitHubAuth {
             // Store token securely
             this.storeToken(data.access_token);
             
+            console.log('Access token obtained successfully');
+            
         } catch (error) {
             console.error('Token exchange failed:', error);
-            throw error;
+            
+            // For demo purposes, we'll show a message about needing a backend
+            throw new Error('Token exchange requires a backend service. For GitHub Pages, consider using GitHub Apps or a proxy service.');
         }
     }
     
@@ -178,6 +207,8 @@ class GitHubAuth {
         try {
             const response = await this.githubRequest('/user');
             this.currentUser = response;
+            
+            console.log('User info fetched:', this.currentUser.login);
             
             // Store user info
             this.storeUser(response);
@@ -199,14 +230,13 @@ class GitHubAuth {
             const [owner, repo] = this.config.github.repo.split('/');
             await this.githubRequest(`/repos/${owner}/${repo}`);
             
-            // User has access to repository
             this.currentUser.hasRepoAccess = true;
+            console.log('Repository access confirmed');
             
         } catch (error) {
             console.warn('Repository access check failed:', error);
             this.currentUser.hasRepoAccess = false;
             
-            // Still allow access for public repositories or if error is not permission-related
             if (error.status !== 403 && error.status !== 404) {
                 this.currentUser.hasRepoAccess = true;
             }
@@ -269,6 +299,8 @@ class GitHubAuth {
      * Logout user
      */
     logout() {
+        console.log('Logging out user');
+        
         // Clear stored data
         this.clearStoredData();
         
@@ -278,10 +310,6 @@ class GitHubAuth {
         
         // Show login screen
         this.showLoginScreen();
-        
-        if (this.config.dev.enableDebugLogging) {
-            console.log('User logged out');
-        }
     }
     
     /**
@@ -296,20 +324,20 @@ class GitHubAuth {
                 this.accessToken = token;
                 this.currentUser = user;
                 
+                console.log('Session restored for user:', user.login);
+                
                 // Verify token is still valid
                 try {
                     await this.fetchUserInfo();
                 } catch (error) {
-                    // Token is invalid, clear stored data
+                    console.log('Stored token invalid, clearing session');
                     this.clearStoredData();
                     throw error;
                 }
             }
             
         } catch (error) {
-            if (this.config.dev.enableDebugLogging) {
-                console.log('Session restoration failed:', error);
-            }
+            console.log('Session restoration failed:', error.message);
             // Don't throw error, just continue without authentication
         }
     }
@@ -319,13 +347,7 @@ class GitHubAuth {
      */
     storeToken(token) {
         try {
-            if (this.config.security.enableTokenEncryption) {
-                // In a real implementation, encrypt the token
-                token = this.encryptToken(token);
-            }
-            
             localStorage.setItem(this.config.auth.tokenKey, token);
-            
         } catch (error) {
             console.error('Failed to store token:', error);
         }
@@ -336,14 +358,7 @@ class GitHubAuth {
      */
     getStoredToken() {
         try {
-            let token = localStorage.getItem(this.config.auth.tokenKey);
-            
-            if (token && this.config.security.enableTokenEncryption) {
-                token = this.decryptToken(token);
-            }
-            
-            return token;
-            
+            return localStorage.getItem(this.config.auth.tokenKey);
         } catch (error) {
             console.error('Failed to retrieve token:', error);
             return null;
@@ -400,22 +415,6 @@ class GitHubAuth {
     }
     
     /**
-     * Basic token encryption (for demonstration)
-     */
-    encryptToken(token) {
-        // In a real implementation, use proper encryption
-        return btoa(token);
-    }
-    
-    /**
-     * Basic token decryption (for demonstration)
-     */
-    decryptToken(encryptedToken) {
-        // In a real implementation, use proper decryption
-        return atob(encryptedToken);
-    }
-    
-    /**
      * Show loading state during authentication
      */
     showLoadingState() {
@@ -430,6 +429,8 @@ class GitHubAuth {
      * Show error state
      */
     showErrorState(message) {
+        console.error('Auth Error:', message);
+        
         const loginContent = document.getElementById('loginContent');
         const loadingContent = document.getElementById('loadingContent');
         
@@ -445,7 +446,11 @@ class GitHubAuth {
                 errorDiv.style.cssText = 'background: #f8d7da; color: #721c24; padding: 15px; border-radius: 8px; margin: 20px 0; border: 1px solid #f5c6cb;';
                 loginContent.appendChild(errorDiv);
             }
-            errorDiv.textContent = message;
+            errorDiv.innerHTML = `
+                <strong>Authentication Error:</strong><br>
+                ${message}<br><br>
+                <small>Check the browser console for more details.</small>
+            `;
         }
     }
     
@@ -465,21 +470,46 @@ class GitHubAuth {
         
         if (loginContent) loginContent.style.display = 'block';
         if (loadingContent) loadingContent.style.display = 'none';
+    }
+    
+    /**
+     * Show main application
+     */
+    showMainApp() {
+        const loginScreen = document.getElementById('loginScreen');
+        const mainApp = document.getElementById('mainApp');
         
-        // Clear any error messages
-        const errorDiv = document.getElementById('errorMessage');
-        if (errorDiv) {
-            errorDiv.remove();
+        if (loginScreen) loginScreen.style.display = 'none';
+        if (mainApp) mainApp.style.display = 'block';
+        
+        // Update user display
+        this.updateUserDisplay();
+        
+        // Initialize application if function exists
+        if (typeof window.initializeApp === 'function') {
+            window.initializeApp();
+        }
+    }
+    
+    /**
+     * Update user display in header
+     */
+    updateUserDisplay() {
+        if (!this.currentUser) return;
+        
+        const userDisplay = document.getElementById('userDisplay');
+        const userAvatar = document.getElementById('userAvatar');
+        
+        if (userDisplay) {
+            userDisplay.textContent = this.currentUser.login;
+        }
+        
+        if (userAvatar && this.currentUser.avatar_url) {
+            userAvatar.src = this.currentUser.avatar_url;
+            userAvatar.style.display = 'block';
         }
     }
 }
 
 // Create global instance
 window.GitHubAuth = new GitHubAuth();
-
-// Initialize when DOM is ready
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => window.GitHubAuth.init());
-} else {
-    window.GitHubAuth.init();
-}
