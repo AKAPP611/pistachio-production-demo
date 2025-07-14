@@ -1,0 +1,2879 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Pistachio Production Management</title>
+<style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .header {
+            background-color: #2c7a2c;
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .nav-btn {
+            padding: 10px 20px;
+            background-color: #2c7a2c;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .nav-btn:hover {
+            background-color: #245a24;
+        }
+        
+        .nav-btn.print-btn {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ff5252 100%);
+            font-weight: bold;
+            border: 2px solid #ff5252;
+            box-shadow: 0 2px 4px rgba(255, 82, 82, 0.3);
+        }
+        
+        .nav-btn.print-btn:hover {
+            background: linear-gradient(135deg, #ff5252 0%, #ff3838 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(255, 82, 82, 0.4);
+        }
+        
+        .nav-btn.active {
+            background-color: #1e4a1e;
+        }
+        
+        .section {
+            display: none;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .section.active {
+            display: block;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .form-grid.materials-grid {
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        label {
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        
+        input,         select {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            background-color: white;
+            cursor: pointer;
+        }
+        
+        select:focus {
+            outline: none;
+            border-color: #2c7a2c;
+            box-shadow: 0 0 0 2px rgba(44, 122, 44, 0.2);
+        }
+        
+        select#boxTypeUsed, select#boxTypeWasted {
+            background-color: #e8f5e9;
+            font-weight: 600;
+            border: 2px solid #c3e6cb;
+        }
+        
+        select#boxTypeUsed:focus, select#boxTypeWasted:focus {
+            background-color: #d4edda;
+            border-color: #2c7a2c;
+        }
+        
+        button {
+            padding: 12px 24px;
+            background-color: #2c7a2c;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        button:hover {
+            background-color: #245a24;
+        }
+        
+        .output-section {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        
+        .reject-section {
+            background-color: #fff3cd;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        
+        .wastage-section {
+            background-color: #f8d7da;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        
+        .materials-section {
+            background-color: #d1ecf1;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+            margin-top: 20px;
+            padding-bottom: 10px;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 500px;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: #2c7a2c;
+            color: white;
+        }
+        
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background-color: #f0f8f0;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            border: 2px solid #2c7a2c;
+        }
+        
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #2c7a2c;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .edit-btn {
+            background-color: #ff9800;
+            padding: 5px 15px;
+        }
+        
+        .delete-btn {
+            background-color: #f44336;
+            padding: 5px 15px;
+        }
+        
+        .total-box {
+            background-color: #e8f5e9;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        
+        .warning-box {
+            background-color: #fff3cd;
+            border: 1px solid #ffeeba;
+            color: #856404;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-grid.materials-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .nav-buttons {
+                flex-wrap: wrap;
+            }
+            
+            .nav-btn {
+                flex: 1 1 calc(50% - 5px);
+                min-width: 120px;
+            }
+            
+            .nav-btn.print-btn {
+                flex: 1 1 100%;
+                margin-top: 10px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-grid.materials-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Print Styles */
+        .print-container {
+            display: none;
+            position: relative;
+        }
+        
+       .print-container::before {
+    content: "CONFIDENTIAL";
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-45deg);
+    font-size: 80px;
+    color: rgba(44, 122, 44, 0.02);
+    font-weight: bold;
+    z-index: 0;
+    pointer-events: none;
+}
+        
+       @media print {
+    body * {
+        visibility: hidden;
+    }
+    
+    #printReport, #printReport * {
+        visibility: visible;
+    }
+    
+    #printReport {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        display: block !important;
+    }
+    
+    @page {
+        size: A4;
+        margin: 15mm;
+    }
+    
+    .print-header {
+        margin: -15mm -15mm 30px -15mm !important;
+        break-after: avoid;
+    }
+    
+    .print-section {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+    
+    .print-table {
+    font-size: 11px;
+    page-break-inside: auto;
+    width: 100%;
+    table-layout: fixed;
+}
+
+.print-table th,
+.print-table td {
+    padding: 4px 6px;
+    word-wrap: break-word;
+    overflow: hidden;
+}
+
+.print-table th:nth-child(1),
+.print-table td:nth-child(1) { width: 12%; }
+.print-table th:nth-child(2),
+.print-table td:nth-child(2) { width: 15%; }
+.print-table th:nth-child(3),
+.print-table td:nth-child(3) { width: 12%; }
+.print-table th:nth-child(4),
+.print-table td:nth-child(4) { width: 12%; }
+.print-table th:nth-child(5),
+.print-table td:nth-child(5) { width: 12%; }
+.print-table th:nth-child(6),
+.print-table td:nth-child(6) { width: 12%; }
+.print-table th:nth-child(7),
+.print-table td:nth-child(7) { width: 10%; }
+.print-table th:nth-child(8),
+.print-table td:nth-child(8) { width: 15%; }
+ }
+        
+        /* Print Report Styles */
+        .print-header {
+    text-align: center;
+    background: linear-gradient(135deg, #2c7a2c 0%, #45a049 100%);
+    color: white;
+    padding: 20px 15px;
+    margin: 0 0 30px 0;
+    border-radius: 0 0 20px 20px;
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.print-header h1 {
+    color: white;
+    font-size: 28px;
+    margin: 0 0 10px 0;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+}
+
+.print-header .subtitle {
+    color: #f0f8f0;
+    font-size: 13px;
+    margin: 5px 0;
+}
+        
+        .print-section {
+            margin-bottom: 30px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .print-section h2 {
+            color: #2c7a2c;
+            font-size: 20px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 5px;
+        }
+        
+        .print-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .print-stat-card {
+            background: linear-gradient(135deg, #f5f5f5 0%, #e8f5e9 100%);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #c3e6cb;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .print-stat-card h3 {
+            color: #2c7a2c;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        
+        .print-stat-card .value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1e4a1e;
+        }
+        
+        .print-chart-container {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-start;
+    margin: 20px 0;
+    padding: 15px;
+    background-color: #fafafa;
+    border-radius: 10px;
+    max-width: 100%;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+        .print-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+        
+        .print-table th {
+            background-color: #2c7a2c;
+            color: white;
+            padding: 8px;
+            text-align: left;
+        }
+        
+        .print-table td {
+            padding: 6px 8px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .print-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        .chart-legend {
+            margin-top: 10px;
+            font-size: 12px;
+        }
+        
+        .legend-item {
+            display: inline-block;
+            margin-right: 15px;
+        }
+        
+        .legend-color {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            margin-right: 5px;
+            vertical-align: middle;
+        }
+        
+        .print-footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #e0e0e0;
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+            position: relative;
+            z-index: 1;
+        }
+    
+@media print {
+    .print-header {
+        text-align: center !important;
+        padding: 15px 10px !important;
+        margin: 0 !important;
+        page-break-inside: avoid !important;
+    }
+    .print-header h1 {
+        margin: 0 0 8px 0 !important;
+        font-size: 24px !important;
+    }
+    .print-header .subtitle {
+        font-size: 12px !important;
+        margin: 3px 0 !important;
+    }
+}
+</style>
+</head>
+<body>
+<!-- Login Screen -->
+<div id="loginScreen" style="min-height: 100vh; background-color: #f5f5f5; display: flex; align-items: center; justify-content: center;">
+<div style="background: white; padding: 40px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); width: 100%; max-width: 400px;">
+<h2 style="text-align: center; color: #2c7a2c; margin-bottom: 30px;">Pistachio Production Login</h2>
+<form onsubmit="handleLogin(event)">
+<div class="form-group">
+<label>Username</label>
+<input id="loginUsername" required="" type="text"/>
+</div>
+<div class="form-group">
+<label>Password</label>
+<input id="loginPassword" required="" type="password"/>
+</div>
+<button style="width: 100%;" type="submit">Login</button>
+</form>
+<div style="margin-top: 20px; padding: 20px; background-color: #f0f0f0; border-radius: 4px;">
+<p style="margin: 0; font-weight: bold;">Demo Users:</p>
+<p style="margin: 5px 0;">Admin: admin / admin123</p>
+<p style="margin: 5px 0;">Operator: operator / op123</p>
+</div>
+</div>
+</div>
+<!-- Main App -->
+<div id="mainApp" style="display: none;">
+<div class="header">
+<h1>Pistachio Production Management</h1>
+<div>
+<span id="userDisplay">User</span>
+<button onclick="logout()" style="margin-left: 20px;">Logout</button>
+</div>
+</div>
+<div class="container">
+<div class="nav-buttons">
+<button class="nav-btn active" onclick="showSection('dashboard', this)">Dashboard</button>
+<button class="nav-btn" onclick="showSection('production', this)">New Production</button>
+<button class="nav-btn" onclick="showSection('records', this)">View Records</button>
+<button class="nav-btn" onclick="showSection('inventory', this)">Inventory</button>
+<button class="nav-btn" onclick="showSection('materials', this)">Materials</button>
+<button class="nav-btn print-btn" onclick="showProductionSelection()">
+<span>📊 Print Report</span>
+</button>
+</div>
+<!-- Dashboard Section -->
+<div class="section active" id="dashboard">
+<h2>Production Dashboard</h2>
+<div class="stats-grid">
+<div class="stat-card">
+<h3>Today's Production</h3>
+<div class="stat-value" id="todayProduction">0</div>
+<p>kg processed</p>
+</div>
+<div class="stat-card">
+<h3>Materials Status</h3>
+<div id="materialsStatus" style="font-size: 1.1em;">
+<div>Bags: <span id="dashBags">0</span></div>
+<div>Golden: <span id="dashBoxesGolden" style="font-size: 0.9em;">0</span> | Extra: <span id="dashBoxesExtra" style="font-size: 0.9em;">0</span></div>
+<div>Pallets: <span id="dashPallets">0</span></div>
+</div>
+<p style="color: #666; font-size: 0.85em; margin-top: 5px;">
+                            *You can choose any box type regardless of input type based on availability
+                        </p>
+</div>
+<div class="stat-card">
+<h3>This Lot</h3>
+<div class="stat-value" id="lotProduction">0</div>
+<p>kg processed</p>
+<p id="currentLotDisplay" style="font-size: 0.9em; color: #666;">No lot yet</p>
+</div>
+<div class="stat-card">
+<h3>Total Inventory</h3>
+<div class="stat-value" id="totalInventory">0</div>
+<p>kg in stock</p>
+</div>
+<div class="stat-card">
+<h3>Yield Rate</h3>
+<div class="stat-value" id="yieldRate">0%</div>
+<p>average</p>
+</div>
+</div>
+<h3>Recent Productions</h3>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>Date</th>
+<th>Lot Number</th>
+<th>Input Type</th>
+<th>Input (kg)</th>
+<th>Output (kg)</th>
+<th>Total Output (+ Reject)</th>
+<th>Operator</th>
+</tr>
+</thead>
+<tbody id="recentProductionsTable">
+<!-- Will be populated by JavaScript -->
+</tbody>
+</table>
+</div>
+</div>
+<!-- Production Entry Section -->
+<div class="section" id="production">
+<h2>New Production Entry</h2>
+<form id="productionForm" onsubmit="saveProduction(event)">
+<div class="form-grid">
+<div class="form-group">
+<label>Date</label>
+<input id="prodDate" required="" type="date"/>
+</div>
+<div class="form-group">
+<label>Lot Number</label>
+<input id="lotNumber" placeholder="e.g., LOT-2024-001" required="" type="text"/>
+</div>
+<div class="form-group">
+<label>Input Type</label>
+<select id="inputType" onchange="updateOutputFields()" required="">
+<option value="">Select Type</option>
+<option value="golden">Golden Pistachio</option>
+<option value="extra">Extra Pistachio</option>
+<option value="huller">Huller Run</option>
+</select>
+</div>
+<div class="form-group">
+<label>Input Weight (kg)</label>
+<input id="inputWeight" min="0" required="" step="0.1" type="number"/>
+</div>
+</div>
+<div class="output-section">
+<h3>Output Products (in kg)</h3>
+<div class="form-grid" id="outputFields">
+<p>Please select input type first</p>
+</div>
+</div>
+<div class="reject-section">
+<h3>Reject Categories (in kg)</h3>
+<div class="form-grid">
+<div class="form-group">
+<label>Loose Shell</label>
+<input id="rejectLooseShell" min="0" step="0.1" type="number" value="0"/>
+</div>
+<div class="form-group">
+<label>Shell &amp; Split</label>
+<input id="rejectShellSplit" min="0" step="0.1" type="number" value="0"/>
+</div>
+<div class="form-group">
+<label>Undersize</label>
+<input id="rejectUndersize" min="0" step="0.1" type="number" value="0"/>
+</div>
+<div class="form-group">
+<label>Dark Stain</label>
+<input id="rejectDarkStain" min="0" step="0.1" type="number" value="0"/>
+</div>
+<div class="form-group">
+<label>Adhering Hull</label>
+<input id="rejectAdheringHull" min="0" step="0.1" type="number" value="0"/>
+</div>
+<div class="form-group">
+<label>Light Stain</label>
+<input id="rejectLightStain" min="0" step="0.1" type="number" value="0"/>
+</div>
+<div class="form-group">
+<label>Loose Kernel</label>
+<input id="rejectLooseKernel" min="0" step="0.1" type="number" value="0"/>
+</div>
+<div class="form-group">
+<label>Dust</label>
+<input id="rejectDust" min="0" step="0.1" type="number" value="0"/>
+</div>
+<div class="form-group">
+<label>Non-Split</label>
+<input id="rejectNonSplit" min="0" step="0.1" type="number" value="0"/>
+</div>
+</div>
+<div class="total-box">
+                            Total Rejects: <span id="totalRejects">0</span> kg
+                        </div>
+</div>
+<div class="materials-section">
+<h3>Materials Used</h3>
+<div style="background-color: #f0f0f0; padding: 10px; border-radius: 4px; margin-bottom: 10px; font-size: 0.9em;">
+<strong>Current Stock:</strong> 
+                            Bags: <span id="stockBagsDisplay">0</span> | 
+                            Golden Boxes: <span id="stockBoxesGoldenDisplay">0</span> | 
+                            Extra Boxes: <span id="stockBoxesExtraDisplay">0</span> | 
+                            Pallets: <span id="stockPalletsDisplay">0</span>
+</div>
+<div class="form-grid materials-grid">
+<div class="form-group">
+<label>Plastic Bags Used</label>
+<input id="plasticBagsUsed" min="0" type="number" value="0"/>
+</div>
+<div class="form-group">
+<label>Box Type <span id="recommendedBoxType" style="color: #2c7a2c; font-size: 0.85em;"></span></label>
+<select id="boxTypeUsed" title="Required when using boxes">
+<option value="">Select Type</option>
+<option value="golden">Golden</option>
+<option value="extra">Extra</option>
+</select>
+</div>
+<div class="form-group">
+<label>Boxes Used</label>
+<input id="boxesUsed" min="0" type="number" value="0"/>
+</div>
+<div class="form-group">
+<label>Pallets Used</label>
+<input id="palletsUsed" min="0" type="number" value="0"/>
+</div>
+</div>
+</div>
+<div class="wastage-section">
+<h3>Packaging Wastage (Damaged/Unusable)</h3>
+<div class="form-grid materials-grid">
+<div class="form-group">
+<label>Plastic Bags Wasted</label>
+<input id="plasticBagsWasted" min="0" type="number" value="0"/>
+</div>
+<div class="form-group">
+<label>Box Type Wasted</label>
+<select id="boxTypeWasted" title="Required when recording wasted boxes">
+<option value="">Select Type</option>
+<option value="golden">Golden</option>
+<option value="extra">Extra</option>
+</select>
+</div>
+<div class="form-group">
+<label>Boxes Wasted</label>
+<input id="boxesWasted" min="0" type="number" value="0"/>
+</div>
+</div>
+<p style="color: #666; font-size: 0.9em; margin-top: 10px;">
+                            *Count damaged or unusable packaging materials that had to be discarded
+                        </p>
+</div>
+<div style="margin-top: 30px;">
+<button type="submit">Save Production</button>
+<button onclick="resetForm()" style="background-color: #6c757d; margin-left: 10px;" type="button">Reset</button>
+<button id="cancelEditBtn" onclick="cancelEdit()" style="background-color: #dc3545; margin-left: 10px; display: none;" type="button">Cancel Edit</button>
+</div>
+</form>
+</div>
+<!-- Records Section -->
+<div class="section" id="records">
+<h2>Production Records</h2>
+<div class="form-grid" style="margin-bottom: 20px;">
+<div class="form-group">
+<label>Filter by Date</label>
+<input id="filterDate" onchange="filterRecords()" type="date"/>
+</div>
+<div class="form-group">
+<label>Search Lot Number</label>
+<input id="searchLot" onkeyup="filterRecords()" placeholder="Search..." type="text"/>
+</div>
+</div>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>Date</th>
+<th>Lot Number</th>
+<th>Input Type</th>
+<th>Input (kg)</th>
+<th>Output (kg)</th>
+<th>Rejects (kg)</th>
+<th>Boxes (G/E)</th>
+<th>Actions</th>
+</tr>
+</thead>
+<tbody id="recordsTable">
+<!-- Will be populated by JavaScript -->
+</tbody>
+</table>
+</div>
+</div>
+<!-- Inventory Section -->
+<div class="section" id="inventory">
+<h2>Current Inventory</h2>
+<p style="color: #666; font-size: 0.9em; margin-bottom: 20px;">
+                    Note: 21-25 and 18-21 grades are Extra quality products from Huller Run processing
+                </p>
+<div class="stats-grid">
+<div class="stat-card">
+<h3>21-25 Extra Grade</h3>
+<div class="stat-value" id="inv2125">0</div>
+<p>kg in stock</p>
+</div>
+<div class="stat-card">
+<h3>18-21 Extra Grade</h3>
+<div class="stat-value" id="inv1821">0</div>
+<p>kg in stock</p>
+</div>
+<div class="stat-card">
+<h3>Golden</h3>
+<div class="stat-value" id="invGolden">0</div>
+<p>kg in stock</p>
+</div>
+<div class="stat-card">
+<h3>Extra (Direct)</h3>
+<div class="stat-value" id="invExtra">0</div>
+<p>kg in stock</p>
+<p style="font-size: 0.8em; color: #666;">From Extra input batches</p>
+</div>
+</div>
+<h3 style="margin-top: 30px;">Reject Inventory</h3>
+<div class="stats-grid">
+<div class="stat-card" style="background-color: #ffe5e5; border-color: #ffcccc;">
+<h3>Total Rejects</h3>
+<div class="stat-value" id="invTotalRejects" style="color: #dc3545;">0</div>
+<p>kg in stock</p>
+</div>
+<div class="stat-card" style="background-color: #fff5f5; border-color: #ffe0e0;">
+<h3>Loose Shell</h3>
+<div class="stat-value" id="invLooseShell" style="color: #dc3545;">0</div>
+<p>kg</p>
+</div>
+<div class="stat-card" style="background-color: #fff5f5; border-color: #ffe0e0;">
+<h3>Shell &amp; Split</h3>
+<div class="stat-value" id="invShellSplit" style="color: #dc3545;">0</div>
+<p>kg</p>
+</div>
+<div class="stat-card" style="background-color: #fff5f5; border-color: #ffe0e0;">
+<h3>Other Rejects</h3>
+<div class="stat-value" id="invOtherRejects" style="color: #dc3545;">0</div>
+<p>kg</p>
+</div>
+</div>
+<h3 style="margin-top: 30px;">Inventory Summary</h3>
+<div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); max-width: 600px; margin: 0 auto 30px;">
+<div class="stat-card" style="background-color: #fff3cd; border-color: #ffeeba;">
+<h3>Total Golden</h3>
+<div class="stat-value" id="totalGoldenInventory">0</div>
+<p>kg total</p>
+</div>
+<div class="stat-card" style="background-color: #d1ecf1; border-color: #bee5eb;">
+<h3>Total Extra</h3>
+<div class="stat-value" id="totalExtraInventory">0</div>
+<p>kg total (all grades)</p>
+</div>
+</div>
+<h3 style="margin-top: 30px;">Material Inventory</h3>
+<div class="stats-grid" style="margin-bottom: 20px;">
+<div class="stat-card">
+<h3>Plastic Bags</h3>
+<div class="stat-value" id="invPlasticBags">0</div>
+<p>pieces</p>
+</div>
+<div class="stat-card">
+<h3>Golden Boxes</h3>
+<div class="stat-value" id="invBoxesGolden">0</div>
+<p>pieces</p>
+</div>
+<div class="stat-card">
+<h3>Extra Boxes</h3>
+<div class="stat-value" id="invBoxesExtra">0</div>
+<p>pieces</p>
+</div>
+<div class="stat-card">
+<h3>Pallets</h3>
+<div class="stat-value" id="invPallets">0</div>
+<p>pieces</p>
+</div>
+</div>
+<button onclick="exportInventory()" style="margin-top: 20px;">Export Inventory Report</button>
+</div>
+<!-- Materials Management Section -->
+<div class="section" id="materials">
+<h2>Materials Management</h2>
+<div class="warning-box" id="noMaterialsWarning" style="display: none;">
+<strong>⚠️ No materials in inventory!</strong><br/>
+                    Please add materials below before starting production.
+                </div>
+<div style="background-color: #e3f2fd; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
+<h3>Add Materials to Inventory</h3>
+<form id="materialsForm" onsubmit="addMaterials(event)">
+<div class="form-grid">
+<div class="form-group">
+<label>Material Type</label>
+<select id="materialType" required="">
+<option value="">Select Material</option>
+<option value="plasticBags">Plastic Bags</option>
+<option value="boxesGolden">Boxes - Golden</option>
+<option value="boxesExtra">Boxes - Extra</option>
+<option value="pallets">Pallets</option>
+</select>
+</div>
+<div class="form-group">
+<label>Quantity</label>
+<input id="materialQuantity" min="1" required="" type="number"/>
+</div>
+<div class="form-group">
+<label>Supplier/Notes</label>
+<input id="materialNotes" placeholder="Optional notes" type="text"/>
+</div>
+</div>
+<button style="margin-top: 10px;" type="submit">Add Materials</button>
+</form>
+</div>
+<h3>Current Material Stock</h3>
+<div class="stats-grid" style="margin-bottom: 30px;">
+<div class="stat-card">
+<h4>Plastic Bags</h4>
+<div class="stat-value" id="currentPlasticBags">0</div>
+<p>pieces available</p>
+</div>
+<div class="stat-card">
+<h4>Boxes - Golden</h4>
+<div class="stat-value" id="currentBoxesGolden">0</div>
+<p>pieces available</p>
+</div>
+<div class="stat-card">
+<h4>Boxes - Extra</h4>
+<div class="stat-value" id="currentBoxesExtra">0</div>
+<p>pieces available</p>
+</div>
+<div class="stat-card">
+<h4>Pallets</h4>
+<div class="stat-value" id="currentPallets">0</div>
+<p>pieces available</p>
+</div>
+</div>
+<h3>Material Transaction History</h3>
+<div class="form-grid" style="margin-bottom: 20px;">
+<div class="form-group">
+<label>Filter by Type</label>
+<select id="filterMaterialType" onchange="displayMaterialTransactions()">
+<option value="">All Materials</option>
+<option value="plasticBags">Plastic Bags</option>
+<option value="boxesGolden">Boxes - Golden</option>
+<option value="boxesExtra">Boxes - Extra</option>
+<option value="pallets">Pallets</option>
+</select>
+</div>
+<div class="form-group">
+<label>Filter by Date</label>
+<input id="filterMaterialDate" onchange="displayMaterialTransactions()" type="date"/>
+</div>
+</div>
+<div class="table-container" style="margin-top: 0;">
+<table>
+<thead>
+<tr>
+<th>Date</th>
+<th>Material</th>
+<th>Type</th>
+<th>Quantity</th>
+<th>Reference</th>
+<th>User</th>
+</tr>
+</thead>
+<tbody id="materialTransactionsTable">
+<!-- Will be populated by JavaScript -->
+</tbody>
+</table>
+</div>
+</div>
+</div> <!-- End of container -->
+</div> <!-- End of mainApp -->
+
+<!-- Production Selection Modal -->
+<div id="productionSelectionModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;">
+    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 10px; max-width: 80%; max-height: 80%; overflow-y: auto;">
+        <h2 style="margin-top: 0; color: #2c7a2c;">Select Productions to Print</h2>
+        <div style="margin-bottom: 20px;">
+            <button onclick="selectAllProductions()" style="margin-right: 10px;">Select All</button>
+            <button onclick="selectNoneProductions()" style="margin-right: 10px;">Select None</button>
+        </div>
+        <div id="productionSelectionList" style="max-height: 300px; overflow-y: auto; border: 1px solid #ddd; padding: 15px;">
+            <!-- Will be populated by JavaScript -->
+        </div>
+        <div style="margin-top: 20px; text-align: right;">
+            <button onclick="closeProductionSelection()" style="background-color: #6c757d; margin-right: 10px;">Cancel</button>
+            <button onclick="generateSelectedPrintReport()" style="background-color: #2c7a2c;">Generate Report</button>
+        </div>
+    </div>
+</div>
+
+<!-- Print Report Container -->
+<div class="print-container" id="printReport">
+<!-- Content will be generated dynamically -->
+</div>
+<script>
+        // Global data storage
+        let productions = JSON.parse(localStorage.getItem('productions') || '[]');
+        let materialTransactions = JSON.parse(localStorage.getItem('materialTransactions') || '[]');
+        let currentUser = null;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            migrateOldBoxData();
+            checkAuth();
+        });
+
+        // Migrate old box data to new format
+        function migrateOldBoxData() {
+            let needsMigration = false;
+            
+            // Check if any transactions have the old 'boxes' type
+            materialTransactions.forEach(trans => {
+                if (trans.materialType === 'boxes') {
+                    needsMigration = true;
+                    // Default to Extra boxes for old data
+                    trans.materialType = 'boxesExtra';
+                }
+            });
+            
+            // Also check for old huller data that might have separate extra field
+            productions.forEach(prod => {
+                if (prod.inputType === 'huller' && prod.output.extra && !prod.output.hullerExtra) {
+                    needsMigration = true;
+                    // Move the extra value to hullerExtra marker to track it's been migrated
+                    prod.output.hullerExtra = (prod.output['21-25'] || 0) + (prod.output['18-21'] || 0) + (prod.output.extra || 0);
+                }
+            });
+            
+            if (needsMigration) {
+                localStorage.setItem('materialTransactions', JSON.stringify(materialTransactions));
+                localStorage.setItem('productions', JSON.stringify(productions));
+                console.log('Migrated old data to new format');
+            }
+        }
+
+        // Check if user is logged in
+        function checkAuth() {
+            const savedUser = localStorage.getItem('currentUser');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                showMainApp();
+            } else {
+                showLoginScreen();
+            }
+        }
+
+        // Show login screen
+        function showLoginScreen() {
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('mainApp').style.display = 'none';
+        }
+
+        // Show main app
+        function showMainApp() {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+            document.getElementById('userDisplay').textContent = currentUser.username + ' (' + currentUser.role + ')';
+            document.getElementById('prodDate').valueAsDate = new Date();
+            updateDashboard();
+            updateInventory();
+            updateMaterialStockDisplay();
+            
+            // Add event listeners for reject calculations
+            document.querySelectorAll('[id^="reject"]').forEach(input => {
+                input.addEventListener('input', calculateTotalRejects);
+            });
+            
+            // Add event listeners for box validation
+            document.getElementById('boxesUsed').addEventListener('input', function() {
+                if (this.value > 0 && !document.getElementById('boxTypeUsed').value) {
+                    document.getElementById('boxTypeUsed').style.borderColor = '#dc3545';
+                } else {
+                    document.getElementById('boxTypeUsed').style.borderColor = '';
+                }
+            });
+            
+            document.getElementById('boxesWasted').addEventListener('input', function() {
+                if (this.value > 0 && !document.getElementById('boxTypeWasted').value) {
+                    document.getElementById('boxTypeWasted').style.borderColor = '#dc3545';
+                } else {
+                    document.getElementById('boxTypeWasted').style.borderColor = '';
+                }
+            });
+            
+            document.getElementById('boxTypeUsed').addEventListener('change', function() {
+                if (document.getElementById('boxesUsed').value > 0 && this.value) {
+                    this.style.borderColor = '';
+                }
+            });
+            
+            document.getElementById('boxTypeWasted').addEventListener('change', function() {
+                if (document.getElementById('boxesWasted').value > 0 && this.value) {
+                    this.style.borderColor = '';
+                }
+            });
+        }
+
+        // Handle login
+        function handleLogin(event) {
+            event.preventDefault();
+            
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            // Simple authentication (in real app, this would check against a database)
+            const validUsers = {
+                'admin': { password: 'admin123', role: 'Admin' },
+                'operator': { password: 'op123', role: 'Operator' }
+            };
+            
+            if (validUsers[username] && validUsers[username].password === password) {
+                currentUser = {
+                    username: username,
+                    role: validUsers[username].role
+                };
+                
+                // Save to localStorage
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                
+                // Clear form
+                document.getElementById('loginUsername').value = '';
+                document.getElementById('loginPassword').value = '';
+                
+                // Show main app
+                showMainApp();
+            } else {
+                alert('Invalid username or password!');
+            }
+        }
+
+        // Logout
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('currentUser');
+                currentUser = null;
+                showLoginScreen();
+            }
+        }
+
+        // Navigation
+        function showSection(section, button) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            
+            document.getElementById(section).classList.add('active');
+            
+            // If button is provided, use it; otherwise find the correct button
+            if (button) {
+                button.classList.add('active');
+            } else {
+                // Find and activate the correct nav button
+                const navButtons = document.querySelectorAll('.nav-btn');
+                navButtons.forEach(btn => {
+                    if (btn.textContent.toLowerCase().includes(section) || 
+                        (section === 'production' && btn.textContent === 'New Production') ||
+                        (section === 'records' && btn.textContent === 'View Records') ||
+                        (section === 'materials' && btn.textContent === 'Materials')) {
+                        btn.classList.add('active');
+                    }
+                });
+            }
+            
+            if (section === 'records') {
+                displayRecords();
+            } else if (section === 'inventory') {
+                updateInventory();
+            } else if (section === 'materials') {
+                updateMaterialsView();
+            } else if (section === 'production') {
+                updateMaterialStockDisplay();
+            }
+        }
+
+        // Update output fields based on input type
+        function updateOutputFields() {
+            const inputType = document.getElementById('inputType').value;
+            const outputFields = document.getElementById('outputFields');
+            const recommendedBoxType = document.getElementById('recommendedBoxType');
+            
+            if (!inputType) {
+                outputFields.innerHTML = '<p>Please select input type first</p>';
+                recommendedBoxType.textContent = '';
+                return;
+            }
+            
+            let html = '';
+            
+            if (inputType === 'golden') {
+                html = `
+                    <div class="form-group">
+                        <label>Golden Output (kg)</label>
+                        <input type="number" id="outputGolden" min="0" step="0.1" required>
+                    </div>
+                `;
+                recommendedBoxType.textContent = '(typically Golden)';
+                // Set default box type to golden if not editing
+                if (!document.getElementById('productionForm').hasAttribute('data-edit-id')) {
+                    document.getElementById('boxTypeUsed').value = 'golden';
+                    document.getElementById('boxTypeWasted').value = 'golden';
+                }
+            } else if (inputType === 'extra') {
+                html = `
+                    <div class="form-group">
+                        <label>Extra Output (kg)</label>
+                        <input type="number" id="outputExtra" min="0" step="0.1" required>
+                    </div>
+                `;
+                recommendedBoxType.textContent = '(typically Extra)';
+                // Set default box type to extra if not editing
+                if (!document.getElementById('productionForm').hasAttribute('data-edit-id')) {
+                    document.getElementById('boxTypeUsed').value = 'extra';
+                    document.getElementById('boxTypeWasted').value = 'extra';
+                }
+            } else if (inputType === 'huller') {
+                html = `
+                    <div style="background-color: #e3f2fd; padding: 10px; border-radius: 4px; margin-bottom: 10px; font-size: 0.9em;">
+                        <strong>ℹ️ Note:</strong> Huller Run produces Extra grade pistachios in two size categories
+                    </div>
+                    <div class="form-group">
+                        <label>21-25 Extra (kg) <span style="color: #1976d2; font-size: 0.85em;">↗ Size Grade</span></label>
+                        <input type="number" id="output2125" min="0" step="0.1" required>
+                    </div>
+                    <div class="form-group">
+                        <label>18-21 Extra (kg) <span style="color: #1976d2; font-size: 0.85em;">↗ Size Grade</span></label>
+                        <input type="number" id="output1821" min="0" step="0.1" required>
+                    </div>
+                `;
+                recommendedBoxType.textContent = '(typically Extra)';
+                // Set default box type to extra if not editing
+                if (!document.getElementById('productionForm').hasAttribute('data-edit-id')) {
+                    document.getElementById('boxTypeUsed').value = 'extra';
+                    document.getElementById('boxTypeWasted').value = 'extra';
+                }
+            }
+            
+            outputFields.innerHTML = html;
+        }
+
+        // Calculate total rejects
+        function calculateTotalRejects() {
+            const rejectFields = [
+                'rejectLooseShell', 'rejectShellSplit', 'rejectUndersize',
+                'rejectDarkStain', 'rejectAdheringHull', 'rejectLightStain',
+                'rejectLooseKernel', 'rejectDust', 'rejectNonSplit'
+            ];
+            
+            let total = 0;
+            rejectFields.forEach(field => {
+                total += parseFloat(document.getElementById(field).value) || 0;
+            });
+            
+            document.getElementById('totalRejects').textContent = total.toFixed(1);
+        }
+
+        // Save production
+        function saveProduction(event) {
+            event.preventDefault();
+            
+            const editId = document.getElementById('productionForm').getAttribute('data-edit-id');
+            const inputType = document.getElementById('inputType').value;
+            
+            const production = {
+                id: editId ? parseInt(editId) : Date.now(),
+                date: document.getElementById('prodDate').value,
+                lotNumber: document.getElementById('lotNumber').value,
+                inputType: inputType,
+                inputWeight: parseFloat(document.getElementById('inputWeight').value),
+                output: {},
+                rejects: {
+                    looseShell: parseFloat(document.getElementById('rejectLooseShell').value) || 0,
+                    shellSplit: parseFloat(document.getElementById('rejectShellSplit').value) || 0,
+                    undersize: parseFloat(document.getElementById('rejectUndersize').value) || 0,
+                    darkStain: parseFloat(document.getElementById('rejectDarkStain').value) || 0,
+                    adheringHull: parseFloat(document.getElementById('rejectAdheringHull').value) || 0,
+                    lightStain: parseFloat(document.getElementById('rejectLightStain').value) || 0,
+                    looseKernel: parseFloat(document.getElementById('rejectLooseKernel').value) || 0,
+                    dust: parseFloat(document.getElementById('rejectDust').value) || 0,
+                    nonSplit: parseFloat(document.getElementById('rejectNonSplit').value) || 0
+                },
+                materials: {
+                    plasticBagsUsed: parseInt(document.getElementById('plasticBagsUsed').value) || 0,
+                    boxTypeUsed: document.getElementById('boxTypeUsed').value,
+                    boxesUsed: parseInt(document.getElementById('boxesUsed').value) || 0,
+                    boxesGoldenUsed: document.getElementById('boxTypeUsed').value === 'golden' ? parseInt(document.getElementById('boxesUsed').value) || 0 : 0,
+                    boxesExtraUsed: document.getElementById('boxTypeUsed').value === 'extra' ? parseInt(document.getElementById('boxesUsed').value) || 0 : 0,
+                    palletsUsed: parseInt(document.getElementById('palletsUsed').value) || 0,
+                    plasticBagsWasted: parseInt(document.getElementById('plasticBagsWasted').value) || 0,
+                    boxTypeWasted: document.getElementById('boxTypeWasted').value,
+                    boxesWasted: parseInt(document.getElementById('boxesWasted').value) || 0,
+                    boxesGoldenWasted: document.getElementById('boxTypeWasted').value === 'golden' ? parseInt(document.getElementById('boxesWasted').value) || 0 : 0,
+                    boxesExtraWasted: document.getElementById('boxTypeWasted').value === 'extra' ? parseInt(document.getElementById('boxesWasted').value) || 0 : 0
+                },
+                operator: editId ? productions.find(p => p.id === parseInt(editId)).operator : currentUser.username,
+                createdAt: editId ? productions.find(p => p.id === parseInt(editId)).createdAt : new Date().toISOString(),
+                updatedBy: editId ? currentUser.username : undefined,
+                updatedAt: editId ? new Date().toISOString() : undefined
+            };
+            
+            // Get output based on input type
+            if (inputType === 'golden') {
+                production.output.golden = parseFloat(document.getElementById('outputGolden').value) || 0;
+            } else if (inputType === 'extra') {
+                production.output.extra = parseFloat(document.getElementById('outputExtra').value) || 0;
+            } else if (inputType === 'huller') {
+                production.output['21-25'] = parseFloat(document.getElementById('output2125').value) || 0;
+                production.output['18-21'] = parseFloat(document.getElementById('output1821').value) || 0;
+               
+            }
+            
+            // Validate box type selection
+            if (production.materials.boxesUsed > 0 && !production.materials.boxTypeUsed) {
+                alert('Please select a box type when using boxes!');
+                return;
+            }
+            
+            if (production.materials.boxesWasted > 0 && !production.materials.boxTypeWasted) {
+                alert('Please select a box type when recording wasted boxes!');
+                return;
+            }
+            
+            // Check material availability
+            const materialStock = calculateMaterialStock();
+            let warnings = [];
+            
+            // Check plastic bags including wastage
+            const totalBagsNeeded = production.materials.plasticBagsUsed + production.materials.plasticBagsWasted;
+            if (totalBagsNeeded > materialStock.plasticBags) {
+                warnings.push(`Not enough plastic bags! Available: ${materialStock.plasticBags}, Total needed: ${totalBagsNeeded} (${production.materials.plasticBagsUsed} used + ${production.materials.plasticBagsWasted} wasted)`);
+            }
+            
+            // Check boxes based on selected type
+            if (production.materials.boxTypeUsed && production.materials.boxesUsed > 0) {
+                const boxType = production.materials.boxTypeUsed;
+                const availableBoxes = boxType === 'golden' ? materialStock.boxesGolden : materialStock.boxesExtra;
+                const boxTypeName = boxType === 'golden' ? 'Golden boxes' : 'Extra boxes';
+                
+                if (production.materials.boxesUsed > availableBoxes) {
+                    warnings.push(`Not enough ${boxTypeName}! Available: ${availableBoxes}, Required: ${production.materials.boxesUsed}`);
+                }
+            }
+            
+            // Check wasted boxes based on selected type
+            if (production.materials.boxTypeWasted && production.materials.boxesWasted > 0) {
+                const boxType = production.materials.boxTypeWasted;
+                const availableBoxes = boxType === 'golden' ? materialStock.boxesGolden : materialStock.boxesExtra;
+                const boxTypeName = boxType === 'golden' ? 'Golden boxes' : 'Extra boxes';
+                
+                // Check if we have enough for both used and wasted (if same type)
+                let totalNeeded = production.materials.boxesWasted;
+                if (production.materials.boxTypeUsed === boxType) {
+                    totalNeeded += production.materials.boxesUsed;
+                }
+                
+                if (totalNeeded > availableBoxes) {
+                    warnings.push(`Not enough ${boxTypeName} for usage + wastage! Available: ${availableBoxes}, Total needed: ${totalNeeded}`);
+                }
+            }
+            
+            if (production.materials.palletsUsed > materialStock.pallets) {
+                warnings.push(`Not enough pallets! Available: ${materialStock.pallets}, Required: ${production.materials.palletsUsed}`);
+            }
+            
+            if (warnings.length > 0) {
+                const proceed = confirm(warnings.join('\n') + '\n\nDo you want to proceed anyway?');
+                if (!proceed) return;
+            }
+            
+            if (editId) {
+                // Update existing production
+                const oldProd = productions.find(p => p.id === parseInt(editId));
+                const originalInputType = document.getElementById('productionForm').getAttribute('data-original-input-type');
+                
+                // Restore original material usage before applying new usage
+                if (oldProd.materials.plasticBagsUsed > 0) {
+                    materialTransactions.push({
+                        id: Date.now() + 10,
+                        date: oldProd.date,
+                        materialType: 'plasticBags',
+                        transactionType: 'returned',
+                        quantity: oldProd.materials.plasticBagsUsed,
+                        reference: `Edit reversal: ${oldProd.lotNumber}`,
+                        user: currentUser.username,
+                        createdAt: new Date().toISOString()
+                    });
+                }
+                
+                // Handle box returns based on box type
+                if (oldProd.materials.boxesUsed > 0 && oldProd.materials.boxTypeUsed) {
+                    const boxType = oldProd.materials.boxTypeUsed === 'golden' ? 'boxesGolden' : 'boxesExtra';
+                    materialTransactions.push({
+                        id: Date.now() + 11,
+                        date: oldProd.date,
+                        materialType: boxType,
+                        transactionType: 'returned',
+                        quantity: oldProd.materials.boxesUsed,
+                        reference: `Edit reversal: ${oldProd.lotNumber}`,
+                        user: currentUser.username,
+                        createdAt: new Date().toISOString()
+                    });
+                } else if (oldProd.materials.boxesGoldenUsed > 0) {
+                    // Old format - Golden boxes
+                    materialTransactions.push({
+                        id: Date.now() + 11,
+                        date: oldProd.date,
+                        materialType: 'boxesGolden',
+                        transactionType: 'returned',
+                        quantity: oldProd.materials.boxesGoldenUsed,
+                        reference: `Edit reversal: ${oldProd.lotNumber}`,
+                        user: currentUser.username,
+                        createdAt: new Date().toISOString()
+                    });
+                } else if (oldProd.materials.boxesExtraUsed > 0) {
+                    // Old format - Extra boxes
+                    materialTransactions.push({
+                        id: Date.now() + 11,
+                        date: oldProd.date,
+                        materialType: 'boxesExtra',
+                        transactionType: 'returned',
+                        quantity: oldProd.materials.boxesExtraUsed,
+                        reference: `Edit reversal: ${oldProd.lotNumber}`,
+                        user: currentUser.username,
+                        createdAt: new Date().toISOString()
+                    });
+                } else if (oldProd.materials.boxesUsed > 0) {
+                    // Very old format - guess based on input type
+                    const oldBoxType = (originalInputType === 'golden') ? 'boxesGolden' : 'boxesExtra';
+                    materialTransactions.push({
+                        id: Date.now() + 11,
+                        date: oldProd.date,
+                        materialType: oldBoxType,
+                        transactionType: 'returned',
+                        quantity: oldProd.materials.boxesUsed,
+                        reference: `Edit reversal: ${oldProd.lotNumber}`,
+                        user: currentUser.username,
+                        createdAt: new Date().toISOString()
+                    });
+                }
+                
+                if (oldProd.materials.palletsUsed > 0) {
+                    materialTransactions.push({
+                        id: Date.now() + 12,
+                        date: oldProd.date,
+                        materialType: 'pallets',
+                        transactionType: 'returned',
+                        quantity: oldProd.materials.palletsUsed,
+                        reference: `Edit reversal: ${oldProd.lotNumber}`,
+                        user: currentUser.username,
+                        createdAt: new Date().toISOString()
+                    });
+                }
+                
+                // Also restore wasted materials
+                if (oldProd.materials.plasticBagsWasted > 0) {
+                    materialTransactions.push({
+                        id: Date.now() + 13,
+                        date: oldProd.date,
+                        materialType: 'plasticBags',
+                        transactionType: 'returned',
+                        quantity: oldProd.materials.plasticBagsWasted,
+                        reference: `Waste edit reversal: ${oldProd.lotNumber}`,
+                        user: currentUser.username,
+                        createdAt: new Date().toISOString()
+                    });
+                }
+                
+                // Handle wasted box returns based on box type
+                if (oldProd.materials.boxesWasted > 0 && oldProd.materials.boxTypeWasted) {
+                    const boxType = oldProd.materials.boxTypeWasted === 'golden' ? 'boxesGolden' : 'boxesExtra';
+                    materialTransactions.push({
+                        id: Date.now() + 14,
+                        date: oldProd.date,
+                        materialType: boxType,
+                        transactionType: 'returned',
+                        quantity: oldProd.materials.boxesWasted,
+                        reference: `Waste edit reversal: ${oldProd.lotNumber}`,
+                        user: currentUser.username,
+                        createdAt: new Date().toISOString()
+                    });
+                } else if (oldProd.materials.boxesGoldenWasted > 0) {
+                    // Old format - Golden boxes
+                    materialTransactions.push({
+                        id: Date.now() + 14,
+                        date: oldProd.date,
+                        materialType: 'boxesGolden',
+                        transactionType: 'returned',
+                        quantity: oldProd.materials.boxesGoldenWasted,
+                        reference: `Waste edit reversal: ${oldProd.lotNumber}`,
+                        user: currentUser.username,
+                        createdAt: new Date().toISOString()
+                    });
+                } else if (oldProd.materials.boxesExtraWasted > 0) {
+                    // Old format - Extra boxes
+                    materialTransactions.push({
+                        id: Date.now() + 14,
+                        date: oldProd.date,
+                        materialType: 'boxesExtra',
+                        transactionType: 'returned',
+                        quantity: oldProd.materials.boxesExtraWasted,
+                        reference: `Waste edit reversal: ${oldProd.lotNumber}`,
+                        user: currentUser.username,
+                        createdAt: new Date().toISOString()
+                    });
+                } else if (oldProd.materials.boxesWasted > 0) {
+                    // Very old format - guess based on input type
+                    const oldBoxType = (originalInputType === 'golden') ? 'boxesGolden' : 'boxesExtra';
+                    materialTransactions.push({
+                        id: Date.now() + 14,
+                        date: oldProd.date,
+                        materialType: oldBoxType,
+                        transactionType: 'returned',
+                        quantity: oldProd.materials.boxesWasted,
+                        reference: `Waste edit reversal: ${oldProd.lotNumber}`,
+                        user: currentUser.username,
+                        createdAt: new Date().toISOString()
+                    });
+                }
+                
+                productions = productions.map(p => p.id === parseInt(editId) ? production : p);
+                alert('Production updated successfully!');
+            } else {
+                // Add new production
+                productions.push(production);
+                alert('Production saved successfully!');
+            }
+            
+            // Save to local storage
+            localStorage.setItem('productions', JSON.stringify(productions));
+            
+            // Create material transactions for used materials
+            if (production.materials.plasticBagsUsed > 0) {
+                const bagTransaction = {
+                    id: Date.now() + 1,
+                    date: production.date,
+                    materialType: 'plasticBags',
+                    transactionType: 'used',
+                    quantity: -production.materials.plasticBagsUsed,
+                    reference: `Production: ${production.lotNumber}`,
+                    user: currentUser.username,
+                    createdAt: new Date().toISOString()
+                };
+                materialTransactions.push(bagTransaction);
+            }
+            
+            if (production.materials.boxesUsed > 0 && production.materials.boxTypeUsed) {
+                const boxType = production.materials.boxTypeUsed === 'golden' ? 'boxesGolden' : 'boxesExtra';
+                const boxTransaction = {
+                    id: Date.now() + 2,
+                    date: production.date,
+                    materialType: boxType,
+                    transactionType: 'used',
+                    quantity: -production.materials.boxesUsed,
+                    reference: `Production: ${production.lotNumber}`,
+                    user: currentUser.username,
+                    createdAt: new Date().toISOString()
+                };
+                materialTransactions.push(boxTransaction);
+            }
+            
+            if (production.materials.palletsUsed > 0) {
+                const palletTransaction = {
+                    id: Date.now() + 3,
+                    date: production.date,
+                    materialType: 'pallets',
+                    transactionType: 'used',
+                    quantity: -production.materials.palletsUsed,
+                    reference: `Production: ${production.lotNumber}`,
+                    user: currentUser.username,
+                    createdAt: new Date().toISOString()
+                };
+                materialTransactions.push(palletTransaction);
+            }
+            
+            // Save material transactions
+            localStorage.setItem('materialTransactions', JSON.stringify(materialTransactions));
+            
+            // Create transactions for wasted materials
+            if (production.materials.plasticBagsWasted > 0) {
+                const wasteBagTransaction = {
+                    id: Date.now() + 4,
+                    date: production.date,
+                    materialType: 'plasticBags',
+                    transactionType: 'wasted',
+                    quantity: -production.materials.plasticBagsWasted,
+                    reference: `Wastage: ${production.lotNumber}`,
+                    user: currentUser.username,
+                    createdAt: new Date().toISOString()
+                };
+                materialTransactions.push(wasteBagTransaction);
+            }
+            
+            if (production.materials.boxesWasted > 0 && production.materials.boxTypeWasted) {
+                const boxType = production.materials.boxTypeWasted === 'golden' ? 'boxesGolden' : 'boxesExtra';
+                const wasteBoxTransaction = {
+                    id: Date.now() + 5,
+                    date: production.date,
+                    materialType: boxType,
+                    transactionType: 'wasted',
+                    quantity: -production.materials.boxesWasted,
+                    reference: `Wastage: ${production.lotNumber}`,
+                    user: currentUser.username,
+                    createdAt: new Date().toISOString()
+                };
+                materialTransactions.push(wasteBoxTransaction);
+            }
+            
+            // Save updated transactions including waste
+            localStorage.setItem('materialTransactions', JSON.stringify(materialTransactions));
+            
+            // Reset form and remove edit ID
+            document.getElementById('productionForm').removeAttribute('data-edit-id');
+            document.getElementById('productionForm').removeAttribute('data-original-input-type');
+            document.getElementById('productionForm').removeAttribute('data-original-golden-boxes');
+            document.getElementById('productionForm').removeAttribute('data-original-extra-boxes');
+            document.getElementById('boxTypeUsed').style.borderColor = '';
+            document.getElementById('boxTypeWasted').style.borderColor = '';
+            document.querySelector('#productionForm button[type="submit"]').textContent = 'Save Production';
+            document.getElementById('cancelEditBtn').style.display = 'none';
+            
+            resetForm();
+            updateDashboard();
+            updateMaterialStockDisplay();
+        }
+
+        // Reset form
+        function resetForm() {
+            document.getElementById('productionForm').reset();
+            document.getElementById('prodDate').valueAsDate = new Date();
+            document.getElementById('totalRejects').textContent = '0';
+            document.getElementById('boxTypeUsed').value = '';
+            document.getElementById('boxTypeWasted').value = '';
+            document.getElementById('recommendedBoxType').textContent = '';
+            updateOutputFields();
+            
+            // Clear edit state
+            document.getElementById('productionForm').removeAttribute('data-edit-id');
+            document.getElementById('productionForm').removeAttribute('data-original-input-type');
+            document.getElementById('productionForm').removeAttribute('data-original-golden-boxes');
+            document.getElementById('productionForm').removeAttribute('data-original-extra-boxes');
+            document.getElementById('boxTypeUsed').style.borderColor = '';
+            document.getElementById('boxTypeWasted').style.borderColor = '';
+            document.querySelector('#productionForm button[type="submit"]').textContent = 'Save Production';
+            document.getElementById('cancelEditBtn').style.display = 'none';
+        }
+
+        // Update dashboard
+        function updateDashboard() {
+            const today = new Date().toDateString();
+            
+            let todayTotal = 0;
+            let currentLotTotal = 0;
+            let currentLotNumber = '';
+            
+            // Find the most recent lot number
+            if (productions.length > 0) {
+                const sortedProductions = [...productions].sort((a, b) => b.id - a.id);
+                currentLotNumber = sortedProductions[0].lotNumber;
+            }
+            
+            productions.forEach(prod => {
+                const prodDate = new Date(prod.date);
+                if (prodDate.toDateString() === today) {
+                    todayTotal += prod.inputWeight;
+                }
+                // Calculate total for current lot
+                if (prod.lotNumber === currentLotNumber) {
+                    currentLotTotal += prod.inputWeight;
+                }
+            });
+            
+            document.getElementById('todayProduction').textContent = todayTotal.toFixed(0);
+            document.getElementById('lotProduction').textContent = currentLotTotal.toFixed(0);
+            document.getElementById('currentLotDisplay').textContent = currentLotNumber || 'No lot yet';
+            
+            // Calculate yield rate
+            let totalInput = 0;
+            let totalOutput = 0;
+            
+            productions.forEach(prod => {
+                totalInput += prod.inputWeight;
+                Object.values(prod.output).forEach(val => totalOutput += val);
+            });
+            
+            const yieldRate = totalInput > 0 ? (totalOutput / totalInput * 100).toFixed(1) : 0;
+            document.getElementById('yieldRate').textContent = yieldRate + '%';
+            
+            // Update material status
+            const stock = calculateMaterialStock();
+            document.getElementById('dashBags').textContent = stock.plasticBags;
+            document.getElementById('dashBags').style.color = stock.plasticBags < 100 ? '#d32f2f' : '#2c7a2c';
+            document.getElementById('dashBoxesGolden').textContent = stock.boxesGolden;
+            document.getElementById('dashBoxesGolden').style.color = stock.boxesGolden < 50 ? '#d32f2f' : '#2c7a2c';
+            document.getElementById('dashBoxesExtra').textContent = stock.boxesExtra;
+            document.getElementById('dashBoxesExtra').style.color = stock.boxesExtra < 50 ? '#d32f2f' : '#2c7a2c';
+            document.getElementById('dashPallets').textContent = stock.pallets;
+            document.getElementById('dashPallets').style.color = stock.pallets < 10 ? '#d32f2f' : '#2c7a2c';
+            
+            // Update recent productions table
+            const sortedProductions = [...productions].sort((a, b) => b.id - a.id);
+            const recentProds = sortedProductions.slice(0, 5);
+            const tbody = document.getElementById('recentProductionsTable');
+            tbody.innerHTML = '';
+            
+           recentProds.forEach(prod => {
+    const totalOutput = Object.entries(prod.output)
+        .filter(([key, value]) => key !== 'hullerExtra')
+        .reduce((sum, [key, val]) => sum + val, 0);
+    
+    // Calculate total rejects
+    const totalRejects = Object.values(prod.rejects).reduce((sum, val) => sum + val, 0);
+    
+    // Calculate total output (good products + rejects)
+    const totalMassOutput = totalOutput + totalRejects;
+    
+    const row = tbody.insertRow();
+    row.innerHTML = `
+        <td>${new Date(prod.date).toLocaleDateString()}</td>
+        <td>${prod.lotNumber}</td>
+        <td>${prod.inputType}</td>
+        <td>${prod.inputWeight.toFixed(1)}</td>
+        <td>${totalOutput.toFixed(1)}</td>
+        <td>${totalMassOutput.toFixed(1)}</td>
+        <td>${prod.operator}</td>
+    `;
+});
+        }
+
+        // Calculate current material stock
+        function calculateMaterialStock() {
+            const stock = {
+                plasticBags: 0,
+                boxesGolden: 0,
+                boxesExtra: 0,
+                pallets: 0
+            };
+            
+            materialTransactions.forEach(trans => {
+                if (stock.hasOwnProperty(trans.materialType)) {
+                    stock[trans.materialType] += trans.quantity;
+                }
+            });
+            
+            return {
+                plasticBags: Math.max(0, stock.plasticBags),
+                boxesGolden: Math.max(0, stock.boxesGolden),
+                boxesExtra: Math.max(0, stock.boxesExtra),
+                pallets: Math.max(0, stock.pallets)
+            };
+        }
+
+        // Update material stock display in production form
+        function updateMaterialStockDisplay() {
+            const stock = calculateMaterialStock();
+            document.getElementById('stockBagsDisplay').textContent = stock.plasticBags;
+            document.getElementById('stockBoxesGoldenDisplay').textContent = stock.boxesGolden;
+            document.getElementById('stockBoxesExtraDisplay').textContent = stock.boxesExtra;
+            document.getElementById('stockPalletsDisplay').textContent = stock.pallets;
+        }
+
+        // Display records
+        function displayRecords() {
+            const tbody = document.getElementById('recordsTable');
+            tbody.innerHTML = '';
+            
+            const filterDate = document.getElementById('filterDate').value;
+            const searchLot = document.getElementById('searchLot').value.toLowerCase();
+            
+            let filtered = productions;
+            
+            if (filterDate) {
+                filtered = filtered.filter(p => p.date === filterDate);
+            }
+            if (searchLot) {
+                filtered = filtered.filter(p => p.lotNumber.toLowerCase().includes(searchLot));
+            }
+            
+            // Sort by ID descending (newest first) by default
+            filtered.sort((a, b) => b.id - a.id);
+            
+            filtered.forEach(prod => {
+    // Calculate total output excluding hullerExtra to avoid double counting
+    const totalOutput = Object.entries(prod.output)
+        .filter(([key, value]) => key !== 'hullerExtra')
+        .reduce((sum, [key, val]) => sum + val, 0);
+                const totalRejects = Object.values(prod.rejects).reduce((sum, val) => sum + val, 0);
+                
+                // Handle both old and new data formats
+                const goldenBoxes = (prod.materials.boxesGoldenUsed || 0) + (prod.materials.boxesGoldenWasted || 0);
+                const extraBoxes = (prod.materials.boxesExtraUsed || 0) + (prod.materials.boxesExtraWasted || 0);
+                
+                // For old data, show boxes used based on input type
+                const displayGoldenBoxes = goldenBoxes || (prod.inputType === 'golden' && prod.materials.boxesUsed ? prod.materials.boxesUsed : 0);
+                const displayExtraBoxes = extraBoxes || ((prod.inputType === 'extra' || prod.inputType === 'huller') && prod.materials.boxesUsed ? prod.materials.boxesUsed : 0);
+                
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${new Date(prod.date).toLocaleDateString()}</td>
+                    <td>${prod.lotNumber}</td>
+                    <td>${prod.inputType}</td>
+                    <td>${prod.inputWeight.toFixed(1)}</td>
+                    <td>${totalOutput.toFixed(1)}</td>
+                    <td>${totalRejects.toFixed(1)}</td>
+                    <td>${displayGoldenBoxes}/${displayExtraBoxes}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="edit-btn" onclick="editProduction(${prod.id})">Edit</button>
+                            <button class="delete-btn" onclick="deleteProduction(${prod.id})">Delete</button>
+                        </div>
+                    </td>
+                `;
+            });
+        }
+
+        // Update inventory
+        function updateInventory() {
+            const inventory = {
+                '21-25': 0,
+                '18-21': 0,
+                golden: 0,
+                extra: 0
+            };
+            
+            const rejectInventory = {
+                looseShell: 0,
+                shellSplit: 0,
+                undersize: 0,
+                darkStain: 0,
+                adheringHull: 0,
+                lightStain: 0,
+                looseKernel: 0,
+                dust: 0,
+                nonSplit: 0,
+                total: 0
+            };
+            
+            productions.forEach(prod => {
+    // Product inventory
+    if (prod.output['21-25']) inventory['21-25'] += prod.output['21-25'];
+    if (prod.output['18-21']) inventory['18-21'] += prod.output['18-21'];
+    if (prod.output.golden) inventory.golden += prod.output.golden;
+    if (prod.output.extra) inventory.extra += prod.output.extra;
+    
+    // Reject inventory
+    Object.entries(prod.rejects).forEach(([category, value]) => {
+        rejectInventory[category] += value;
+        rejectInventory.total += value;
+    });
+});
+            
+            // Update product displays
+            document.getElementById('inv2125').textContent = inventory['21-25'].toFixed(0);
+            document.getElementById('inv1821').textContent = inventory['18-21'].toFixed(0);
+            document.getElementById('invGolden').textContent = inventory.golden.toFixed(0);
+            document.getElementById('invExtra').textContent = inventory.extra.toFixed(0);
+            
+            // Update reject displays
+            document.getElementById('invTotalRejects').textContent = rejectInventory.total.toFixed(0);
+            document.getElementById('invLooseShell').textContent = rejectInventory.looseShell.toFixed(0);
+            document.getElementById('invShellSplit').textContent = rejectInventory.shellSplit.toFixed(0);
+            
+            // Calculate other rejects (all except loose shell and shell & split)
+            const otherRejects = rejectInventory.total - rejectInventory.looseShell - rejectInventory.shellSplit;
+            document.getElementById('invOtherRejects').textContent = otherRejects.toFixed(0);
+            
+            // Calculate totals by type
+            const totalGolden = inventory.golden;
+            const totalExtra = inventory['21-25'] + inventory['18-21'] + inventory.extra;
+            
+            document.getElementById('totalGoldenInventory').textContent = totalGolden.toFixed(0);
+            document.getElementById('totalExtraInventory').textContent = totalExtra.toFixed(0);
+            
+            // Update total inventory (products + rejects)
+            const totalProducts = Object.values(inventory).reduce((sum, val) => sum + val, 0);
+            const grandTotal = totalProducts + rejectInventory.total;
+            document.getElementById('totalInventory').textContent = grandTotal.toFixed(0);
+            
+            // Calculate material inventory from transactions
+            const materialStock = {
+                plasticBags: 0,
+                boxesGolden: 0,
+                boxesExtra: 0,
+                pallets: 0
+            };
+            
+            materialTransactions.forEach(trans => {
+                if (materialStock.hasOwnProperty(trans.materialType)) {
+                    materialStock[trans.materialType] += trans.quantity;
+                }
+            });
+            
+            document.getElementById('invPlasticBags').textContent = Math.max(0, materialStock.plasticBags);
+            document.getElementById('invBoxesGolden').textContent = Math.max(0, materialStock.boxesGolden);
+            document.getElementById('invBoxesExtra').textContent = Math.max(0, materialStock.boxesExtra);
+            document.getElementById('invPallets').textContent = Math.max(0, materialStock.pallets);
+        }
+
+        // Filter records
+        function filterRecords() {
+            displayRecords();
+        }
+
+        // Edit production
+        function editProduction(id) {
+            const prod = productions.find(p => p.id === id);
+            if (!prod) return;
+            
+            // Switch to production form
+            showSection('production');
+            
+            // Fill form with existing data
+            document.getElementById('prodDate').value = prod.date;
+            document.getElementById('lotNumber').value = prod.lotNumber;
+            document.getElementById('inputType').value = prod.inputType;
+            document.getElementById('inputWeight').value = prod.inputWeight;
+            
+            // Update output fields first
+            updateOutputFields();
+            
+            // Fill output data after a brief delay to ensure fields are created
+            setTimeout(() => {
+                if (prod.inputType === 'golden' && prod.output.golden) {
+                    document.getElementById('outputGolden').value = prod.output.golden;
+                } else if (prod.inputType === 'extra' && prod.output.extra) {
+                    document.getElementById('outputExtra').value = prod.output.extra;
+                } else if (prod.inputType === 'huller') {
+                    if (prod.output['21-25']) document.getElementById('output2125').value = prod.output['21-25'];
+                    if (prod.output['18-21']) document.getElementById('output1821').value = prod.output['18-21'];
+                    // Note: Old data might have extra field, but we no longer show it for huller
+                }
+            }, 100);
+            
+            // Fill reject data
+            document.getElementById('rejectLooseShell').value = prod.rejects.looseShell || 0;
+            document.getElementById('rejectShellSplit').value = prod.rejects.shellSplit || 0;
+            document.getElementById('rejectUndersize').value = prod.rejects.undersize || 0;
+            document.getElementById('rejectDarkStain').value = prod.rejects.darkStain || 0;
+            document.getElementById('rejectAdheringHull').value = prod.rejects.adheringHull || 0;
+            document.getElementById('rejectLightStain').value = prod.rejects.lightStain || 0;
+            document.getElementById('rejectLooseKernel').value = prod.rejects.looseKernel || 0;
+            document.getElementById('rejectDust').value = prod.rejects.dust || 0;
+            document.getElementById('rejectNonSplit').value = prod.rejects.nonSplit || 0;
+            
+            // Fill materials data
+            document.getElementById('plasticBagsUsed').value = prod.materials.plasticBagsUsed || 0;
+            
+            // Handle box used data
+            if (prod.materials.boxTypeUsed) {
+                // New format with dropdown
+                document.getElementById('boxTypeUsed').value = prod.materials.boxTypeUsed;
+                document.getElementById('boxesUsed').value = prod.materials.boxesUsed || 0;
+            } else if (prod.materials.boxesGoldenUsed || prod.materials.boxesExtraUsed) {
+                // Old format with separate fields
+                if (prod.materials.boxesGoldenUsed > 0) {
+                    document.getElementById('boxTypeUsed').value = 'golden';
+                    document.getElementById('boxesUsed').value = prod.materials.boxesGoldenUsed;
+                } else if (prod.materials.boxesExtraUsed > 0) {
+                    document.getElementById('boxTypeUsed').value = 'extra';
+                    document.getElementById('boxesUsed').value = prod.materials.boxesExtraUsed;
+                }
+            } else if (prod.materials.boxesUsed) {
+                // Very old format - guess based on input type
+                if (prod.inputType === 'golden') {
+                    document.getElementById('boxTypeUsed').value = 'golden';
+                } else {
+                    document.getElementById('boxTypeUsed').value = 'extra';
+                }
+                document.getElementById('boxesUsed').value = prod.materials.boxesUsed;
+            }
+            
+            document.getElementById('palletsUsed').value = prod.materials.palletsUsed || 0;
+            document.getElementById('plasticBagsWasted').value = prod.materials.plasticBagsWasted || 0;
+            
+            // Handle box wasted data
+            if (prod.materials.boxTypeWasted) {
+                // New format with dropdown
+                document.getElementById('boxTypeWasted').value = prod.materials.boxTypeWasted;
+                document.getElementById('boxesWasted').value = prod.materials.boxesWasted || 0;
+            } else if (prod.materials.boxesGoldenWasted || prod.materials.boxesExtraWasted) {
+                // Old format with separate fields
+                if (prod.materials.boxesGoldenWasted > 0) {
+                    document.getElementById('boxTypeWasted').value = 'golden';
+                    document.getElementById('boxesWasted').value = prod.materials.boxesGoldenWasted;
+                } else if (prod.materials.boxesExtraWasted > 0) {
+                    document.getElementById('boxTypeWasted').value = 'extra';
+                    document.getElementById('boxesWasted').value = prod.materials.boxesExtraWasted;
+                }
+            } else if (prod.materials.boxesWasted) {
+                // Very old format - guess based on input type
+                if (prod.inputType === 'golden') {
+                    document.getElementById('boxTypeWasted').value = 'golden';
+                } else {
+                    document.getElementById('boxTypeWasted').value = 'extra';
+                }
+                document.getElementById('boxesWasted').value = prod.materials.boxesWasted;
+            }
+            
+            // Calculate total rejects
+            calculateTotalRejects();
+            
+            // Store the ID we're editing
+            document.getElementById('productionForm').setAttribute('data-edit-id', id);
+            
+            // Store original material usage and input type for comparison
+            document.getElementById('productionForm').setAttribute('data-original-bags', prod.materials.plasticBagsUsed || 0);
+            document.getElementById('productionForm').setAttribute('data-original-golden-boxes', prod.materials.boxesGoldenUsed || 0);
+            document.getElementById('productionForm').setAttribute('data-original-extra-boxes', prod.materials.boxesExtraUsed || 0);
+            document.getElementById('productionForm').setAttribute('data-original-pallets', prod.materials.palletsUsed || 0);
+            document.getElementById('productionForm').setAttribute('data-original-input-type', prod.inputType);
+            
+            // Change button text
+            document.querySelector('#productionForm button[type="submit"]').textContent = 'Update Production';
+            
+            // Show cancel button
+            document.getElementById('cancelEditBtn').style.display = 'inline-block';
+        }
+
+        // Cancel edit
+        function cancelEdit() {
+            resetForm();
+            showSection('records');
+        }
+
+        // Delete production
+        function deleteProduction(id) {
+    if (!confirm('Are you sure you want to delete this record?')) return;
+    
+    // Find the production being deleted to return its materials
+    const prod = productions.find(p => p.id === id);
+    if (prod && prod.materials) {
+        // Return used materials
+        if (prod.materials.plasticBagsUsed > 0) {
+            materialTransactions.push({
+                id: Date.now() + 1,
+                date: prod.date,
+                materialType: 'plasticBags',
+                transactionType: 'returned',
+                quantity: prod.materials.plasticBagsUsed,
+                reference: `Production deleted: ${prod.lotNumber}`,
+                user: currentUser.username,
+                createdAt: new Date().toISOString()
+            });
+        }
+        
+        // Return used boxes - handle different data formats
+        if (prod.materials.boxesUsed > 0 && prod.materials.boxTypeUsed) {
+            // New format with dropdown
+            const boxType = prod.materials.boxTypeUsed === 'golden' ? 'boxesGolden' : 'boxesExtra';
+            materialTransactions.push({
+                id: Date.now() + 2,
+                date: prod.date,
+                materialType: boxType,
+                transactionType: 'returned',
+                quantity: prod.materials.boxesUsed,
+                reference: `Production deleted: ${prod.lotNumber}`,
+                user: currentUser.username,
+                createdAt: new Date().toISOString()
+            });
+        } else if (prod.materials.boxesGoldenUsed > 0) {
+            // Old format - Golden boxes
+            materialTransactions.push({
+                id: Date.now() + 2,
+                date: prod.date,
+                materialType: 'boxesGolden',
+                transactionType: 'returned',
+                quantity: prod.materials.boxesGoldenUsed,
+                reference: `Production deleted: ${prod.lotNumber}`,
+                user: currentUser.username,
+                createdAt: new Date().toISOString()
+            });
+        } else if (prod.materials.boxesExtraUsed > 0) {
+            // Old format - Extra boxes
+            materialTransactions.push({
+                id: Date.now() + 2,
+                date: prod.date,
+                materialType: 'boxesExtra',
+                transactionType: 'returned',
+                quantity: prod.materials.boxesExtraUsed,
+                reference: `Production deleted: ${prod.lotNumber}`,
+                user: currentUser.username,
+                createdAt: new Date().toISOString()
+            });
+        } else if (prod.materials.boxesUsed > 0) {
+            // Very old format - guess based on input type
+            const boxType = (prod.inputType === 'golden') ? 'boxesGolden' : 'boxesExtra';
+            materialTransactions.push({
+                id: Date.now() + 2,
+                date: prod.date,
+                materialType: boxType,
+                transactionType: 'returned',
+                quantity: prod.materials.boxesUsed,
+                reference: `Production deleted: ${prod.lotNumber}`,
+                user: currentUser.username,
+                createdAt: new Date().toISOString()
+            });
+        }
+        
+        if (prod.materials.palletsUsed > 0) {
+            materialTransactions.push({
+                id: Date.now() + 3,
+                date: prod.date,
+                materialType: 'pallets',
+                transactionType: 'returned',
+                quantity: prod.materials.palletsUsed,
+                reference: `Production deleted: ${prod.lotNumber}`,
+                user: currentUser.username,
+                createdAt: new Date().toISOString()
+            });
+        }
+        
+        // Return wasted materials
+        if (prod.materials.plasticBagsWasted > 0) {
+            materialTransactions.push({
+                id: Date.now() + 4,
+                date: prod.date,
+                materialType: 'plasticBags',
+                transactionType: 'returned',
+                quantity: prod.materials.plasticBagsWasted,
+                reference: `Waste returned from deleted production: ${prod.lotNumber}`,
+                user: currentUser.username,
+                createdAt: new Date().toISOString()
+            });
+        }
+        
+        // Return wasted boxes - handle different data formats
+        if (prod.materials.boxesWasted > 0 && prod.materials.boxTypeWasted) {
+            // New format with dropdown
+            const boxType = prod.materials.boxTypeWasted === 'golden' ? 'boxesGolden' : 'boxesExtra';
+            materialTransactions.push({
+                id: Date.now() + 5,
+                date: prod.date,
+                materialType: boxType,
+                transactionType: 'returned',
+                quantity: prod.materials.boxesWasted,
+                reference: `Waste returned from deleted production: ${prod.lotNumber}`,
+                user: currentUser.username,
+                createdAt: new Date().toISOString()
+            });
+        } else if (prod.materials.boxesGoldenWasted > 0) {
+            // Old format - Golden boxes
+            materialTransactions.push({
+                id: Date.now() + 5,
+                date: prod.date,
+                materialType: 'boxesGolden',
+                transactionType: 'returned',
+                quantity: prod.materials.boxesGoldenWasted,
+                reference: `Waste returned from deleted production: ${prod.lotNumber}`,
+                user: currentUser.username,
+                createdAt: new Date().toISOString()
+            });
+        } else if (prod.materials.boxesExtraWasted > 0) {
+            // Old format - Extra boxes
+            materialTransactions.push({
+                id: Date.now() + 5,
+                date: prod.date,
+                materialType: 'boxesExtra',
+                transactionType: 'returned',
+                quantity: prod.materials.boxesExtraWasted,
+                reference: `Waste returned from deleted production: ${prod.lotNumber}`,
+                user: currentUser.username,
+                createdAt: new Date().toISOString()
+            });
+        } else if (prod.materials.boxesWasted > 0) {
+            // Very old format - guess based on input type
+            const boxType = (prod.inputType === 'golden') ? 'boxesGolden' : 'boxesExtra';
+            materialTransactions.push({
+                id: Date.now() + 5,
+                date: prod.date,
+                materialType: boxType,
+                transactionType: 'returned',
+                quantity: prod.materials.boxesWasted,
+                reference: `Waste returned from deleted production: ${prod.lotNumber}`,
+                user: currentUser.username,
+                createdAt: new Date().toISOString()
+            });
+        }
+        
+        // Save updated material transactions
+        localStorage.setItem('materialTransactions', JSON.stringify(materialTransactions));
+    }
+    
+    productions = productions.filter(p => p.id !== id);
+    localStorage.setItem('productions', JSON.stringify(productions));
+    displayRecords();
+    updateDashboard();
+    updateInventory();
+    updateMaterialStockDisplay();
+}
+
+        // Export inventory
+        function exportInventory() {
+            let csv = 'Product,Quantity (kg)\n';
+            csv += `21-25 Extra Grade,${document.getElementById('inv2125').textContent}\n`;
+            csv += `18-21 Extra Grade,${document.getElementById('inv1821').textContent}\n`;
+            csv += `Golden,${document.getElementById('invGolden').textContent}\n`;
+            csv += `Extra (Direct),${document.getElementById('invExtra').textContent}\n`;
+            csv += '\nMaterials,Quantity\n';
+            csv += `Plastic Bags,${document.getElementById('invPlasticBags').textContent}\n`;
+            csv += `Golden Boxes,${document.getElementById('invBoxesGolden').textContent}\n`;
+            csv += `Extra Boxes,${document.getElementById('invBoxesExtra').textContent}\n`;
+            csv += `Pallets,${document.getElementById('invPallets').textContent}\n`;
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'inventory-' + new Date().toISOString().split('T')[0] + '.csv';
+            a.click();
+        }
+
+        // Show Production Selection Modal
+function showProductionSelection() {
+    const modal = document.getElementById('productionSelectionModal');
+    const listContainer = document.getElementById('productionSelectionList');
+    
+    // Sort productions by date (newest first)
+    const sortedProductions = [...productions].sort((a, b) => new Date(b.date) - new Date(a.date));
+    
+    let html = '';
+    sortedProductions.forEach(prod => {
+        const totalOutput = Object.entries(prod.output)
+            .filter(([key, value]) => key !== 'hullerExtra')
+            .reduce((sum, [key, val]) => sum + val, 0);
+        const totalRejects = Object.values(prod.rejects).reduce((sum, val) => sum + val, 0);
+        
+        html += `
+            <div style="display: flex; align-items: center; padding: 8px; border-bottom: 1px solid #eee;">
+                <input type="checkbox" id="prod_${prod.id}" value="${prod.id}" checked style="margin-right: 10px;">
+                <label for="prod_${prod.id}" style="flex: 1; cursor: pointer;">
+                    <strong>${prod.lotNumber}</strong> - ${new Date(prod.date).toLocaleDateString()} 
+                    (${prod.inputType}, ${prod.inputWeight.toFixed(1)}kg → ${totalOutput.toFixed(1)}kg output, ${totalRejects.toFixed(1)}kg rejects)
+                </label>
+            </div>
+        `;
+    });
+    
+    listContainer.innerHTML = html;
+    modal.style.display = 'block';
+}
+
+// Select All Productions
+function selectAllProductions() {
+    const checkboxes = document.querySelectorAll('#productionSelectionList input[type="checkbox"]');
+    checkboxes.forEach(cb => cb.checked = true);
+}
+
+// Select None Productions
+function selectNoneProductions() {
+    const checkboxes = document.querySelectorAll('#productionSelectionList input[type="checkbox"]');
+    checkboxes.forEach(cb => cb.checked = false);
+}
+
+// Close Production Selection Modal
+function closeProductionSelection() {
+    document.getElementById('productionSelectionModal').style.display = 'none';
+}
+
+// Generate Print Report with Selected Productions
+function generateSelectedPrintReport() {
+    const selectedIds = [];
+    const checkboxes = document.querySelectorAll('#productionSelectionList input[type="checkbox"]:checked');
+    
+    checkboxes.forEach(cb => {
+        selectedIds.push(parseInt(cb.value));
+    });
+    
+    if (selectedIds.length === 0) {
+        alert('Please select at least one production record to print.');
+        return;
+    }
+    
+    // Close modal
+    closeProductionSelection();
+    
+    // Show loading message
+    const buttons = document.querySelectorAll('.print-btn');
+    const button = buttons[0];
+    const originalText = button.innerHTML;
+    button.innerHTML = '⏳ Generating...';
+    button.disabled = true;
+    
+    setTimeout(() => {
+        const reportContainer = document.getElementById('printReport');
+        const today = new Date();
+        
+        // Calculate statistics for selected productions only
+        const stats = calculateReportStatistics(selectedIds);
+        
+        // Generate HTML content
+        reportContainer.innerHTML = `
+            <div class="print-header">
+                <h1>🥜 Pistachio Production Report</h1>
+                <div class="subtitle">Generated: ${today.toLocaleDateString()} at ${today.toLocaleTimeString()}</div>
+                <div class="subtitle">Period: ${stats.dateRange} (${selectedIds.length} selected records)</div>
+            </div>
+            
+            <div class="print-section">
+                <h2>📊 Executive Summary</h2>
+                <div class="print-grid">
+                    <div class="print-stat-card">
+                        <h3>Total Production</h3>
+                        <div class="value">${stats.totalProduction.toLocaleString()} kg</div>
+                    </div>
+                    <div class="print-stat-card">
+                        <h3>Average Yield Rate</h3>
+                        <div class="value">${stats.yieldRate}%</div>
+                    </div>
+                    <div class="print-stat-card">
+                        <h3>Total Output</h3>
+                        <div class="value">${stats.totalOutput.toLocaleString()} kg</div>
+                    </div>
+                    <div class="print-stat-card">
+                        <h3>Total Rejects</h3>
+                        <div class="value">${stats.totalRejects.toLocaleString()} kg</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="print-section">
+                <h2>📈 Production Analysis</h2>
+                <div class="print-chart-container">
+                    ${generateProductionPieChart(stats.productionByType)}
+                    ${generateYieldBarChart(stats.yieldByType)}
+                </div>
+            </div>
+            
+            <div class="print-section">
+                <h2>📦 Materials & Inventory Status</h2>
+                <div class="print-chart-container">
+                    ${generateMaterialsChart(stats.materialsUsed)}
+                    ${generateInventoryChart(stats.currentInventory)}
+                </div>
+            </div>
+            
+            <div class="print-section">
+                <h2>📋 Selected Production Summary</h2>
+                ${generateProductionTable(stats.recentProductions)}
+            </div>
+            
+            <div class="print-section">
+                <h2>✅ Quality Metrics</h2>
+                <div class="print-grid">
+                    <div class="print-stat-card">
+                        <h3>Reject Rate</h3>
+                        <div class="value" style="color: ${stats.rejectRate > 10 ? '#dc3545' : '#28a745'};">${stats.rejectRate}%</div>
+                    </div>
+                    <div class="print-stat-card">
+                        <h3>Box Efficiency</h3>
+                        <div class="value" style="color: ${stats.boxEfficiency < 90 ? '#dc3545' : '#28a745'};">${stats.boxEfficiency}%</div>
+                    </div>
+                </div>
+                ${generateRejectsChart(stats.rejectsByCategory)}
+            </div>
+            
+            <div class="print-footer">
+                <p><strong>Pistachio Production Management System</strong> - Confidential Report</p>
+                <p>Generated by: ${currentUser.username} (${currentUser.role})</p>
+                <p style="font-size: 10px; margin-top: 10px;">© 2024 - This report contains proprietary information</p>
+            </div>
+        `;
+        
+        // Restore button
+        button.innerHTML = originalText;
+        button.disabled = false;
+        
+        // Trigger print dialog
+        setTimeout(() => {
+            window.print();
+        }, 100);
+    }, 500);
+}
+        
+        // Calculate report statistics
+function calculateReportStatistics(selectedIds = null) {
+    const now = new Date();
+    const thirtyDaysAgo = new Date(now - 30 * 24 * 60 * 60 * 1000);
+    
+    let stats = {
+        totalProduction: 0,
+        totalOutput: 0,
+        totalRejects: 0,
+        yieldRate: 0,
+        rejectRate: 0,
+        boxEfficiency: 0,
+        productionByType: { golden: 0, extra: 0, huller: 0 },
+        yieldByType: { 
+            golden: { input: 0, output: 0 }, 
+            extra: { input: 0, output: 0 }, 
+            huller: { input: 0, output: 0 } 
+        },
+        rejectsByCategory: {},
+        materialsUsed: { bags: 0, goldenBoxes: 0, extraBoxes: 0, pallets: 0 },
+        currentInventory: {},
+        recentProductions: [],
+        dateRange: ''
+    };
+    let rejectInventory = {
+        looseShell: 0,
+        shellSplit: 0,
+        undersize: 0,
+        darkStain: 0,
+        adheringHull: 0,
+        lightStain: 0,
+        looseKernel: 0,
+        dust: 0,
+        nonSplit: 0,
+        total: 0
+    };
+
+    // Get productions based on selection or default to recent
+    let recentProds;
+    if (selectedIds && selectedIds.length > 0) {
+        recentProds = productions.filter(p => selectedIds.includes(p.id));
+    } else {
+        recentProds = productions.filter(p => new Date(p.date) >= thirtyDaysAgo);
+    }
+    
+            
+            if (recentProds.length > 0) {
+                const oldestDate = new Date(Math.min(...recentProds.map(p => new Date(p.date))));
+                const newestDate = new Date(Math.max(...recentProds.map(p => new Date(p.date))));
+                stats.dateRange = `${oldestDate.toLocaleDateString()} - ${newestDate.toLocaleDateString()}`;
+            } else if (productions.length > 0) {
+                const oldestDate = new Date(Math.min(...productions.map(p => new Date(p.date))));
+                const newestDate = new Date(Math.max(...productions.map(p => new Date(p.date))));
+                stats.dateRange = `${oldestDate.toLocaleDateString()} - ${newestDate.toLocaleDateString()} (All time)`;
+            } else {
+                stats.dateRange = 'No data available';
+            }
+            
+            // Calculate totals
+            recentProds.forEach(prod => {
+                stats.totalProduction += prod.inputWeight;
+                
+                // Output by type
+                Object.values(prod.output).forEach(val => stats.totalOutput += val);
+                
+                // Production by input type
+                stats.productionByType[prod.inputType] += prod.inputWeight;
+                
+                // Calculate yield by type
+                const outputSum = Object.values(prod.output).reduce((sum, val) => sum + val, 0);
+                stats.yieldByType[prod.inputType].input += prod.inputWeight;
+                stats.yieldByType[prod.inputType].output += outputSum;
+                
+                // Rejects
+                Object.entries(prod.rejects).forEach(([category, value]) => {
+                    stats.totalRejects += value;
+                    if (!stats.rejectsByCategory[category]) {
+                        stats.rejectsByCategory[category] = 0;
+                    }
+                    stats.rejectsByCategory[category] += value;
+                });
+                
+                // Materials
+                stats.materialsUsed.bags += prod.materials.plasticBagsUsed || 0;
+                stats.materialsUsed.goldenBoxes += (prod.materials.boxesGoldenUsed || 0) + 
+                    (prod.materials.boxTypeUsed === 'golden' && prod.materials.boxesUsed ? prod.materials.boxesUsed : 0);
+                stats.materialsUsed.extraBoxes += (prod.materials.boxesExtraUsed || 0) + 
+                    (prod.materials.boxTypeUsed === 'extra' && prod.materials.boxesUsed ? prod.materials.boxesUsed : 0);
+                stats.materialsUsed.pallets += prod.materials.palletsUsed || 0;
+            });
+            
+            // Calculate rates
+            stats.yieldRate = stats.totalProduction > 0 ? 
+                ((stats.totalOutput / stats.totalProduction) * 100).toFixed(1) : 0;
+            stats.rejectRate = stats.totalProduction > 0 ? 
+                ((stats.totalRejects / stats.totalProduction) * 100).toFixed(1) : 0;
+            
+            // Box efficiency (used vs wasted)
+            let totalBoxesUsed = stats.materialsUsed.goldenBoxes + stats.materialsUsed.extraBoxes;
+            let totalBoxesWasted = 0;
+            recentProds.forEach(prod => {
+                totalBoxesWasted += (prod.materials.boxesGoldenWasted || 0) + (prod.materials.boxesExtraWasted || 0) +
+                    (prod.materials.boxTypeWasted === 'golden' && prod.materials.boxesWasted ? prod.materials.boxesWasted : 0) +
+                    (prod.materials.boxTypeWasted === 'extra' && prod.materials.boxesWasted ? prod.materials.boxesWasted : 0);
+            });
+            const totalBoxes = totalBoxesUsed + totalBoxesWasted;
+            stats.boxEfficiency = totalBoxes > 0 ? 
+                ((totalBoxesUsed / totalBoxes) * 100).toFixed(1) : 100;
+            
+            // Current inventory
+const inventory = {
+    '21-25': 0,
+    '18-21': 0,
+    golden: 0,
+    extra: 0,
+    totalRejects: 0
+};
+
+productions.forEach(prod => {
+    // Product inventory
+    if (prod.output['21-25']) inventory['21-25'] += prod.output['21-25'];
+    if (prod.output['18-21']) inventory['18-21'] += prod.output['18-21'];
+    if (prod.output.golden) inventory.golden += prod.output.golden;
+    if (prod.output.extra) inventory.extra += prod.output.extra;
+    
+    // Reject inventory
+    Object.entries(prod.rejects).forEach(([type, value]) => {
+        rejectInventory[type] += value;
+        rejectInventory.total += value;
+        inventory.totalRejects += value;
+    });
+});
+
+stats.currentInventory = inventory;
+            
+            // Recent productions for table
+            stats.recentProductions = recentProds.slice(-10).reverse();
+            
+            return stats;
+        }
+        
+        // Generate Production Pie Chart
+        function generateProductionPieChart(data) {
+            const total = Object.values(data).reduce((sum, val) => sum + (parseFloat(val) || 0), 0);
+            if (total === 0) {
+                return `
+                    <div style="text-align: center; padding: 40px;">
+                        <h3 style="color: #2c7a2c; margin-bottom: 10px;">Production by Type</h3>
+                        <div style="color: #999;">No production data available</div>
+                    </div>
+                `;
+            }
+            
+            const colors = { golden: '#FFD700', extra: '#87CEEB', huller: '#98D8C8' };
+            const labels = { golden: 'Golden', extra: 'Extra', huller: 'Huller Run' };
+            
+            let startAngle = 0;
+            let paths = '';
+            let legend = '';
+            
+            Object.entries(data).forEach(([type, value]) => {
+                if (value > 0) {
+                    const percentage = (value / total) * 100;
+                    const angle = (value / total) * 360;
+                    const endAngle = startAngle + angle;
+                    
+                    const x1 = 100 + 80 * Math.cos((startAngle * Math.PI) / 180);
+                    const y1 = 100 + 80 * Math.sin((startAngle * Math.PI) / 180);
+                    const x2 = 100 + 80 * Math.cos((endAngle * Math.PI) / 180);
+                    const y2 = 100 + 80 * Math.sin((endAngle * Math.PI) / 180);
+                    
+                    const largeArc = angle > 180 ? 1 : 0;
+                    
+                    paths += `<path d="M 100 100 L ${x1} ${y1} A 80 80 0 ${largeArc} 1 ${x2} ${y2} Z" fill="${colors[type]}" stroke="white" stroke-width="2"/>`;
+                    
+                    legend += `<div class="legend-item"><span class="legend-color" style="background-color: ${colors[type]}"></span>${labels[type]}: ${percentage.toFixed(1)}%</div>`;
+                    
+                    startAngle = endAngle;
+                }
+            });
+            
+            return `
+                <div style="text-align: center;">
+                    <h3 style="color: #2c7a2c; margin-bottom: 10px;">Production by Type</h3>
+                    <svg width="200" height="200" viewBox="0 0 200 200">
+                        ${paths}
+                    </svg>
+                    <div class="chart-legend">${legend}</div>
+                </div>
+            `;
+        }
+        
+        // Generate Yield Bar Chart
+        function generateYieldBarChart(data) {
+            const types = ['golden', 'extra', 'huller'];
+            const labels = { golden: 'Golden', extra: 'Extra', huller: 'Huller' };
+            const maxYield = 100;
+            
+            let hasData = false;
+            types.forEach(type => {
+                if (data[type] && data[type].input > 0) hasData = true;
+            });
+            
+            if (!hasData) {
+                return `
+                    <div style="text-align: center;">
+                        <h3 style="color: #2c7a2c; margin-bottom: 10px;">Yield Rate by Type</h3>
+                        <div style="color: #999; padding: 20px;">No yield data available</div>
+                    </div>
+                `;
+            }
+            
+            let bars = '';
+            let xPos = 30;
+            
+            types.forEach(type => {
+                if (data[type] && data[type].input > 0) {
+                    const yield = data[type].input > 0 ? (data[type].output / data[type].input) * 100 : 0;
+                    const height = (yield / maxYield) * 120;
+                    
+                    bars += `
+                        <rect x="${xPos}" y="${140 - height}" width="40" height="${height}" fill="#2c7a2c" />
+                        <text x="${xPos + 20}" y="${155}" text-anchor="middle" font-size="12">${labels[type]}</text>
+                        <text x="${xPos + 20}" y="${135 - height}" text-anchor="middle" font-size="11" fill="#2c7a2c">${yield.toFixed(1)}%</text>
+                    `;
+                    
+                    xPos += 60;
+                }
+            });
+            
+            return `
+                <div style="text-align: center;">
+                    <h3 style="color: #2c7a2c; margin-bottom: 10px;">Yield Rate by Type</h3>
+                    <svg width="220" height="180" viewBox="0 0 220 180">
+                        <line x1="20" y1="140" x2="200" y2="140" stroke="#ccc" stroke-width="2"/>
+                        ${bars}
+                    </svg>
+                </div>
+            `;
+        }
+        
+        // Generate Materials Chart
+        function generateMaterialsChart(data) {
+            const totalMaterials = Object.values(data).reduce((sum, val) => sum + val, 0);
+            if (totalMaterials === 0) {
+                return `
+                    <div style="text-align: center;">
+                        <h3 style="color: #2c7a2c; margin-bottom: 10px;">Materials Used (30 days)</h3>
+                        <div style="color: #999; padding: 20px;">No materials data available</div>
+                    </div>
+                `;
+            }
+            
+            const maxValue = Math.max(...Object.values(data), 100);
+            const scale = 100 / maxValue;
+            
+            return `
+                <div style="text-align: center;">
+                    <h3 style="color: #2c7a2c; margin-bottom: 10px;">Materials Used (30 days)</h3>
+                    <div style="display: flex; align-items: flex-end; justify-content: center; gap: 15px;">
+                        <div style="text-align: center;">
+                            <div style="width: 40px; height: ${data.bags * scale}px; background: #4CAF50; margin: 0 auto;"></div>
+                            <div style="font-size: 10px; margin-top: 5px;">Bags</div>
+                            <div style="font-size: 12px; font-weight: bold;">${data.bags}</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="width: 40px; height: ${data.goldenBoxes * scale}px; background: #FFD700; margin: 0 auto;"></div>
+                            <div style="font-size: 10px; margin-top: 5px;">Golden</div>
+                            <div style="font-size: 12px; font-weight: bold;">${data.goldenBoxes}</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="width: 40px; height: ${data.extraBoxes * scale}px; background: #87CEEB; margin: 0 auto;"></div>
+                            <div style="font-size: 10px; margin-top: 5px;">Extra</div>
+                            <div style="font-size: 12px; font-weight: bold;">${data.extraBoxes}</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="width: 40px; height: ${data.pallets * scale}px; background: #8B4513; margin: 0 auto;"></div>
+                            <div style="font-size: 10px; margin-top: 5px;">Pallets</div>
+                            <div style="font-size: 12px; font-weight: bold;">${data.pallets}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Generate Inventory Chart
+function generateInventoryChart(data) {
+    const total = Object.values(data).reduce((sum, val) => sum + val, 0);
+    
+    return `
+        <div style="text-align: center;">
+            <h3 style="color: #2c7a2c; margin-bottom: 10px;">Current Inventory</h3>
+            <div style="background: #f5f5f5; padding: 20px; border-radius: 10px;">
+                <div style="font-size: 24px; font-weight: bold; color: #2c7a2c; margin-bottom: 10px;">${total.toFixed(0)} kg</div>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; font-size: 12px;">
+                    <div><strong>21-25 Extra:</strong> ${data['21-25'].toFixed(0)} kg</div>
+                    <div><strong>18-21 Extra:</strong> ${data['18-21'].toFixed(0)} kg</div>
+                    <div><strong>Golden:</strong> ${data.golden.toFixed(0)} kg</div>
+                    <div><strong>Extra (Direct):</strong> ${data.extra.toFixed(0)} kg</div>
+                    <div style="color: #dc3545;"><strong>Total Rejects:</strong> ${data.totalRejects.toFixed(0)} kg</div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+        // Generate Production Table
+        function generateProductionTable(productions) {
+            if (productions.length === 0) {
+                return '<p>No recent productions</p>';
+            }
+            
+            let rows = '';
+            productions.forEach(prod => {
+                const totalOutput = Object.values(prod.output).reduce((sum, val) => sum + val, 0);
+                const totalRejects = Object.values(prod.rejects).reduce((sum, val) => sum + val, 0);
+                const yield = prod.inputWeight > 0 ? ((totalOutput / prod.inputWeight) * 100).toFixed(1) : 0;
+                
+                rows += `
+                    <tr>
+                        <td>${new Date(prod.date).toLocaleDateString()}</td>
+                        <td>${prod.lotNumber}</td>
+                        <td>${prod.inputType}</td>
+                        <td>${prod.inputWeight.toFixed(1)}</td>
+                        <td>${totalOutput.toFixed(1)}</td>
+                        <td>${totalRejects.toFixed(1)}</td>
+                        <td>${yield}%</td>
+                        <td>${prod.operator}</td>
+                    </tr>
+                `;
+            });
+            
+            return `
+                <table class="print-table">
+                   <thead>
+<tr>
+<th>Date</th>
+<th>Lot Number</th>
+<th>Input Type</th>
+<th>Input (kg)</th>
+<th>Output (kg)</th>
+<th>Rejects (kg)</th>
+<th>Yield %</th>
+<th>Operator</th>
+</tr>
+</thead>
+                    <tbody>${rows}</tbody>
+                </table>
+            `;
+        }
+        
+       // Generate Rejects Chart
+function generateRejectsChart(data) {
+    const categories = Object.entries(data).sort((a, b) => b[1] - a[1]);
+    if (categories.length === 0) {
+        return `
+            <div style="text-align: center; margin-top: 20px;">
+                <h3 style="color: #2c7a2c; margin-bottom: 10px;">All Reject Categories</h3>
+                <div style="color: #999; padding: 20px;">No reject data available</div>
+            </div>
+        `;
+    }
+    
+    const maxValue = Math.max(...categories.map(c => c[1]));
+    const chartWidth = 400;  // Increased width
+    const barHeight = 18;    // Slightly smaller bars for better spacing
+    const chartHeight = categories.length * 28 + 50;  // Better spacing
+    
+    // Chart layout constants
+    const labelWidth = 100;      // Space for category labels
+    const barStartX = labelWidth + 10;  // Start bars after labels + padding
+    const barMaxWidth = 180;     // Maximum bar width
+    const valueTextPadding = 50; // Space for value text on the right
+    
+    let bars = '';
+    let yPos = 35;  // Start position with more top padding
+    
+    categories.forEach(([category, value]) => {
+        // Calculate bar width ensuring it fits within available space
+        const width = Math.min((value / maxValue) * barMaxWidth, barMaxWidth);
+        const label = category.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+        
+        bars += `
+            <text x="5" y="${yPos + 12}" font-size="10" text-anchor="start">${label}</text>
+            <rect x="${barStartX}" y="${yPos}" width="${width}" height="${barHeight}" fill="#dc3545" opacity="0.8" stroke="#dc3545" stroke-width="0.5"/>
+            <text x="${barStartX + width + 5}" y="${yPos + 12}" font-size="9" text-anchor="start">${value.toFixed(1)} kg</text>
+        `;
+        
+        yPos += 28;  // Consistent spacing between bars
+    });
+    
+    return `
+        <div style="text-align: center; margin-top: 20px;">
+            <h3 style="color: #2c7a2c; margin-bottom: 10px;">All Reject Categories</h3>
+            <svg width="${chartWidth}" height="${chartHeight}" viewBox="0 0 ${chartWidth} ${chartHeight}" style="border: 1px solid #e0e0e0; background: #fafafa;">
+                ${bars}
+            </svg>
+        </div>
+    `;
+}        // Add materials to inventory
+        function addMaterials(event) {
+            event.preventDefault();
+            
+            const materialType = document.getElementById('materialType').value;
+            const quantity = parseInt(document.getElementById('materialQuantity').value);
+            const notes = document.getElementById('materialNotes').value;
+            
+            const transaction = {
+                id: Date.now(),
+                date: new Date().toISOString().split('T')[0],
+                materialType: materialType,
+                transactionType: 'added',
+                quantity: quantity,
+                reference: notes || 'Manual addition',
+                user: currentUser.username,
+                createdAt: new Date().toISOString()
+            };
+            
+            materialTransactions.push(transaction);
+            localStorage.setItem('materialTransactions', JSON.stringify(materialTransactions));
+            
+            alert('Materials added successfully!');
+            document.getElementById('materialsForm').reset();
+            updateMaterialsView();
+            updateInventory();
+            updateMaterialStockDisplay();
+        }
+
+        // Update materials view
+        function updateMaterialsView() {
+            // Calculate current stock
+            const stock = {
+                plasticBags: 0,
+                boxesGolden: 0,
+                boxesExtra: 0,
+                pallets: 0
+            };
+            
+            materialTransactions.forEach(trans => {
+                if (stock.hasOwnProperty(trans.materialType)) {
+                    stock[trans.materialType] += trans.quantity;
+                }
+            });
+            
+            // Show warning if no materials
+            const hasNoMaterials = stock.plasticBags <= 0 && stock.boxesGolden <= 0 && stock.boxesExtra <= 0 && stock.pallets <= 0;
+            document.getElementById('noMaterialsWarning').style.display = hasNoMaterials ? 'block' : 'none';
+            
+            document.getElementById('currentPlasticBags').textContent = Math.max(0, stock.plasticBags);
+            document.getElementById('currentBoxesGolden').textContent = Math.max(0, stock.boxesGolden);
+            document.getElementById('currentBoxesExtra').textContent = Math.max(0, stock.boxesExtra);
+            document.getElementById('currentPallets').textContent = Math.max(0, stock.pallets);
+            
+            displayMaterialTransactions();
+        }
+
+        // Display material transactions
+        function displayMaterialTransactions() {
+            const tbody = document.getElementById('materialTransactionsTable');
+            tbody.innerHTML = '';
+            
+            const filterType = document.getElementById('filterMaterialType').value;
+            const filterDate = document.getElementById('filterMaterialDate').value;
+            
+            let filtered = materialTransactions;
+            
+            if (filterType) {
+                filtered = filtered.filter(t => t.materialType === filterType);
+            }
+            if (filterDate) {
+                filtered = filtered.filter(t => t.date === filterDate);
+            }
+            
+            // Sort by date descending
+            filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+            
+            filtered.forEach(trans => {
+                const row = tbody.insertRow();
+                const materialName = trans.materialType === 'plasticBags' ? 'Plastic Bags' : 
+                                   trans.materialType === 'boxesGolden' ? 'Boxes - Golden' :
+                                   trans.materialType === 'boxesExtra' ? 'Boxes - Extra' : 'Pallets';
+                const typeStyle = trans.transactionType === 'added' || trans.transactionType === 'returned' ? 'color: green;' : 'color: red;';
+                const quantityDisplay = trans.transactionType === 'added' || trans.transactionType === 'returned' ? `+${Math.abs(trans.quantity)}` : trans.quantity;
+                
+                row.innerHTML = `
+                    <td>${new Date(trans.date).toLocaleDateString()}</td>
+                    <td>${materialName}</td>
+                    <td style="${typeStyle}">${trans.transactionType}</td>
+                    <td style="${typeStyle}"><strong>${quantityDisplay}</strong></td>
+                    <td>${trans.reference}</td>
+                    <td>${trans.user}</td>
+                `;
+            });
+        }
+    </script>
+</body>
+</html>
