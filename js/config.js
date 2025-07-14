@@ -6,10 +6,10 @@
 const Config = {
     // GitHub OAuth Configuration
     github: {
-        clientId: 'your-oauth-app-client-id', // Replace with your OAuth app client ID
+        clientId: 'Iv1. Ov23lizH9QoqwmOf0JD8',              // Your OAuth , // 
         redirectUri: window.location.origin + window.location.pathname,
         scopes: 'repo',
-        repo: 'owner/pistachio-production', // Replace with your repository
+        repo: 'https://github.com/AKAPP611/pistachio-production-demo', // Replace with your repository
         branch: 'main',
         apiUrl: 'https://api.github.com'
     },
