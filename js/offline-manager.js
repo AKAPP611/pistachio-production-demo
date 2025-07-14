@@ -228,7 +228,7 @@ class OfflineManager {
                         this.syncQueue = this.syncQueue.filter(q => q.id !== item.id);
                         
                         // Optionally store failed items for manual retry
-                        await this.storeFailed​Item(item, error);
+                        await this.storeFailedItem(item, error);
                     }
                 }
             }
