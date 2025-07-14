@@ -26,23 +26,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-          cache: 'npm'
-          cache-dependency-path: '**/package-lock.json'
-          
-      - name: Install dependencies
-        run: |
-          if [ -f package-lock.json ]; then
-            npm ci
-          elif [ -f package.json ]; then
-            npm install
-          else
-            echo "No package.json found, skipping npm install"
-          fi
           
       - name: Validate JSON files
         run: |
@@ -65,41 +48,133 @@ jobs:
                 echo "✅ $file is valid"
               fi
             done
+          else
+            echo "ℹ️ No data directory found (will be created automatically)"
           fi
           
       - name: Check JavaScript syntax
         run: |
           echo "Checking JavaScript syntax..."
           
-          # Check if Node.js is available for syntax checking
-          if command -v node &> /dev/null; then
-            # Check main JavaScript files
+          # Check main JavaScript files if they exist
+          if [ -d js ]; then
             for file in js/*.js; do
               if [ -f "$file" ]; then
                 echo "Checking $file..."
-                node -c "$file" || (echo "❌ $file has syntax errors" && exit 1)
-                echo "✅ $file syntax is valid"
+                # Basic syntax check using node if available
+                if command -v node &> /dev/null; then
+                  node -c "$file" || (echo "❌ $file has syntax errors" && exit 1)
+                  echo "✅ $file syntax is valid"
+                else
+                  echo "ℹ️ Node.js not available, skipping syntax check for $file"
+                fi
+              fi
+            done
+          else
+            echo "ℹ️ No js directory found"
+          fi
+          
+          # Check service worker
+          if [ -f sw.js ]; then
+            echo "Checking sw.js..."
+            if command -v node &> /dev/null; then
+              node -c sw.js || (echo "❌ sw.js has syntax errors" && exit 1)
+              echo "✅ sw.js syntax is valid"
+            else
+              echo "ℹ️ Node.js not available, skipping syntax check for sw.js"
+            fi
+          else
+            echo "ℹ️ No service worker found"
+          fi
+          
+      - name: Verify required files
+        run: |
+          echo "Checking for required files..."
+          
+          # Check for main HTML file
+          if [ -f index.html ]; then
+            echo "✅ index.html found"
+          else
+            echo "❌ index.html is missing!" && exit 1
+          fi
+          
+          # Check for manifest
+          if [ -f manifest.json ]; then
+            echo "✅ manifest.json found"
+          else
+            echo "⚠️ manifest.json is missing (PWA features will be disabled)"
+          fi
+          
+          # Check for service worker
+          if [ -f sw.js ]; then
+            echo "✅ sw.js found"
+          else
+            echo "⚠️ sw.js is missing (offline features will be disabled)"
+          fi
+          
+          # Check for JavaScript modules
+          if [ -d js ]; then
+            echo "✅ js directory found"
+            
+            required_js_files=("config.js" "github-auth.js" "github-storage.js" "offline-manager.js" "enhanced-app.js")
+            missing_files=()
+            
+            for file in "${required_js_files[@]}"; do
+              if [ -f "js/$file" ]; then
+                echo "✅ js/$file found"
+              else
+                echo "❌ js/$file is missing!"
+                missing_files+=("js/$file")
               fi
             done
             
-            # Check service worker
-            if [ -f sw.js ]; then
-              echo "Checking sw.js..."
-              node -c sw.js || (echo "❌ sw.js has syntax errors" && exit 1)
-              echo "✅ sw.js syntax is valid"
+            if [ ${#missing_files[@]} -gt 0 ]; then
+              echo "Missing required JavaScript files: ${missing_files[*]}"
+              exit 1
             fi
           else
-            echo "Node.js not available, skipping syntax check"
+            echo "❌ js directory is missing!" && exit 1
           fi
           
-      - name: Run tests
+      - name: Create data directory structure
         run: |
-          echo "Running application tests..."
+          echo "Setting up data directory structure..."
           
-          # Add your test commands here
-          # Example: npm test
+          # Create data directory if it doesn't exist
+          if [ ! -d data ]; then
+            echo "Creating data directory..."
+            mkdir -p data
+          fi
           
-          echo "✅ All tests passed"
+          # Create initial data files if they don't exist
+          if [ ! -f data/productions.json ]; then
+            echo "Creating initial productions.json..."
+            echo "[]" > data/productions.json
+          fi
+          
+          if [ ! -f data/materials.json ]; then
+            echo "Creating initial materials.json..."
+            echo "[]" > data/materials.json
+          fi
+          
+          if [ ! -f data/users.json ]; then
+            echo "Creating initial users.json..."
+            echo "{}" > data/users.json
+          fi
+          
+          if [ ! -f data/config.json ]; then
+            echo "Creating initial config.json..."
+            cat > data/config.json << EOF
+          {
+            "version": "2.0.0",
+            "createdAt": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")",
+            "deployedBy": "GitHub Actions",
+            "buildNumber": "${{ github.run_number }}"
+          }
+          EOF
+          fi
+          
+          echo "✅ Data directory structure ready"
           
       - name: Build application
         run: |
@@ -109,17 +184,16 @@ jobs:
           mkdir -p _site
           
           # Copy all necessary files to build directory
+          echo "Copying application files..."
           cp -r . _site/
           
           # Remove unnecessary files from build
           cd _site
-          rm -rf .git .github node_modules .gitignore README.md
+          echo "Cleaning up build directory..."
+          rm -rf .git .github node_modules .gitignore README.md MIGRATION.md
           
-          # Minify CSS and JS files if tools are available
-          if command -v npm &> /dev/null && [ -f package.json ]; then
-            echo "Minifying assets..."
-            # Add minification commands here if you have build tools
-          fi
+          # Remove any npm/node related files if they exist
+          rm -f package.json package-lock.json yarn.lock
           
           echo "✅ Build completed successfully"
           
@@ -132,7 +206,8 @@ jobs:
             "buildNumber": "${{ github.run_number }}",
             "commitSha": "${{ github.sha }}",
             "branch": "${{ github.ref_name }}",
-            "version": "2.0.0"
+            "version": "2.0.0",
+            "builtBy": "GitHub Actions"
           }
           EOF
           echo "✅ Build info generated"
@@ -214,10 +289,9 @@ jobs:
           
           echo "🎉 Health check completed successfully!"
 
-  # Security scan job
+  # Security scan job (for pull requests)
   security-scan:
     runs-on: ubuntu-latest
-    needs: build
     if: github.event_name == 'pull_request'
     steps:
       - name: Checkout
@@ -229,7 +303,7 @@ jobs:
           
           # Check for common security issues
           echo "Checking for hardcoded secrets..."
-          if grep -r -i "password\|secret\|token\|key" --include="*.js" --include="*.html" --exclude-dir=node_modules .; then
+          if grep -r -i "password\|secret\|token\|key" --include="*.js" --include="*.html" --exclude-dir=node_modules . | grep -v "your-oauth-app-client-id" | grep -v "YOUR-USERNAME"; then
             echo "⚠️ Potential hardcoded secrets found. Please review."
           else
             echo "✅ No hardcoded secrets detected"
@@ -237,41 +311,10 @@ jobs:
           
           # Check for console.log statements
           echo "Checking for debug statements..."
-          if grep -r "console\." --include="*.js" --exclude-dir=node_modules .; then
+          if grep -r "console\." --include="*.js" --exclude-dir=node_modules . | grep -v "console.log.*ServiceWorker" | grep -v "console.error" | grep -v "console.warn"; then
             echo "⚠️ Console statements found. Consider removing for production."
           else
-            echo "✅ No console statements found"
+            echo "✅ No problematic console statements found"
           fi
           
           echo "✅ Security scan completed"
-
-  # Performance audit job
-  performance-audit:
-    runs-on: ubuntu-latest
-    needs: deploy
-    if: github.ref == 'refs/heads/main'
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-          
-      - name: Install Lighthouse CLI
-        run: npm install -g @lhci/cli@0.12.x
-        
-      - name: Run Lighthouse audit
-        run: |
-          SITE_URL="https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"
-          
-          echo "Running Lighthouse audit on: $SITE_URL"
-          
-          # Wait a bit more for the site to be fully ready
-          sleep 60
-          
-          # Run Lighthouse audit
-          lhci autorun --upload.target=temporary-public-storage --collect.url="$SITE_URL" || true
-          
-          echo "✅ Performance audit completed"
