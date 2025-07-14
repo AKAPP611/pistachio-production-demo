@@ -1,5 +1,25 @@
 [
   {
+    "id": 1752496900939,
+    "date": "2025-07-14",
+    "materialType": "boxesExtra",
+    "transactionType": "added",
+    "quantity": 20000,
+    "reference": "Manual addition",
+    "user": "AKAPP611",
+    "createdAt": "2025-07-14T12:41:40.939Z"
+  },
+  {
+    "id": 1752496892575,
+    "date": "2025-07-14",
+    "materialType": "plasticBags",
+    "transactionType": "added",
+    "quantity": 1000,
+    "reference": "Manual addition",
+    "user": "AKAPP611",
+    "createdAt": "2025-07-14T12:41:32.575Z"
+  },
+  {
     "id": 1752496510226,
     "date": "2025-07-14",
     "materialType": "plasticBags",
