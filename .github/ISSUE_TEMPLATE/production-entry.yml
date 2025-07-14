@@ -1,1 +1,255 @@
+name: 📊 Production Entry
+description: Quick production data entry from mobile or field
+title: "[PRODUCTION] "
+labels: ["production", "data-entry", "mobile"]
+assignees: []
 
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## 🥜 Quick Production Entry
+        
+        Use this form to quickly record production data when you're in the field or away from the main application.
+        This data will be automatically processed and added to the production database.
+        
+        **📱 Mobile Friendly:** This form is optimized for mobile devices and can be used offline.
+
+  - type: input
+    id: date
+    attributes:
+      label: Production Date
+      description: Date when production occurred
+      placeholder: "YYYY-MM-DD (e.g., 2024-01-15)"
+    validations:
+      required: true
+
+  - type: input
+    id: lot_number
+    attributes:
+      label: Lot Number
+      description: Unique identifier for this production lot
+      placeholder: "e.g., LOT-2024-001"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: input_type
+    attributes:
+      label: Input Type
+      description: Type of pistachio being processed
+      options:
+        - Golden Pistachio
+        - Extra Pistachio
+        - Huller Run
+    validations:
+      required: true
+
+  - type: input
+    id: input_weight
+    attributes:
+      label: Input Weight (kg)
+      description: Total weight of raw materials input
+      placeholder: "Enter weight in kilograms"
+    validations:
+      required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        ### 📦 Output Products
+        Enter the output quantities based on the input type selected above.
+
+  - type: input
+    id: output_golden
+    attributes:
+      label: Golden Output (kg)
+      description: Only fill if input type is Golden Pistachio
+      placeholder: "0"
+
+  - type: input
+    id: output_extra
+    attributes:
+      label: Extra Output (kg)
+      description: Only fill if input type is Extra Pistachio
+      placeholder: "0"
+
+  - type: input
+    id: output_21_25
+    attributes:
+      label: 21-25 Extra Output (kg)
+      description: Only fill if input type is Huller Run
+      placeholder: "0"
+
+  - type: input
+    id: output_18_21
+    attributes:
+      label: 18-21 Extra Output (kg)
+      description: Only fill if input type is Huller Run
+      placeholder: "0"
+
+  - type: markdown
+    attributes:
+      value: |
+        ### ❌ Reject Categories
+        Record the weight of different reject categories (in kg).
+
+  - type: input
+    id: reject_loose_shell
+    attributes:
+      label: Loose Shell (kg)
+      placeholder: "0"
+
+  - type: input
+    id: reject_shell_split
+    attributes:
+      label: Shell & Split (kg)
+      placeholder: "0"
+
+  - type: input
+    id: reject_undersize
+    attributes:
+      label: Undersize (kg)
+      placeholder: "0"
+
+  - type: input
+    id: reject_dark_stain
+    attributes:
+      label: Dark Stain (kg)
+      placeholder: "0"
+
+  - type: input
+    id: reject_adhering_hull
+    attributes:
+      label: Adhering Hull (kg)
+      placeholder: "0"
+
+  - type: input
+    id: reject_light_stain
+    attributes:
+      label: Light Stain (kg)
+      placeholder: "0"
+
+  - type: input
+    id: reject_loose_kernel
+    attributes:
+      label: Loose Kernel (kg)
+      placeholder: "0"
+
+  - type: input
+    id: reject_dust
+    attributes:
+      label: Dust (kg)
+      placeholder: "0"
+
+  - type: input
+    id: reject_non_split
+    attributes:
+      label: Non-Split (kg)
+      placeholder: "0"
+
+  - type: markdown
+    attributes:
+      value: |
+        ### 📦 Materials Used
+        Record the packaging materials used in production.
+
+  - type: input
+    id: plastic_bags_used
+    attributes:
+      label: Plastic Bags Used
+      placeholder: "0"
+
+  - type: dropdown
+    id: box_type_used
+    attributes:
+      label: Box Type Used
+      description: Type of boxes used for packaging
+      options:
+        - ""
+        - Golden
+        - Extra
+
+  - type: input
+    id: boxes_used
+    attributes:
+      label: Number of Boxes Used
+      placeholder: "0"
+
+  - type: input
+    id: pallets_used
+    attributes:
+      label: Pallets Used
+      placeholder: "0"
+
+  - type: markdown
+    attributes:
+      value: |
+        ### 🗑️ Packaging Wastage
+        Record any damaged or unusable packaging materials.
+
+  - type: input
+    id: plastic_bags_wasted
+    attributes:
+      label: Plastic Bags Wasted
+      placeholder: "0"
+
+  - type: dropdown
+    id: box_type_wasted
+    attributes:
+      label: Box Type Wasted
+      options:
+        - ""
+        - Golden
+        - Extra
+
+  - type: input
+    id: boxes_wasted
+    attributes:
+      label: Number of Boxes Wasted
+      placeholder: "0"
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Additional Notes
+      description: Any additional comments or observations
+      placeholder: "Optional: Equipment issues, quality observations, etc."
+
+  - type: input
+    id: operator
+    attributes:
+      label: Operator Name
+      description: Name of the person conducting this production
+      placeholder: "Your name"
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: verification
+    attributes:
+      label: Verification
+      description: Please confirm the following
+      options:
+        - label: I have double-checked all measurements and quantities
+          required: true
+        - label: All reject categories have been properly sorted and weighed
+          required: true
+        - label: Material usage counts are accurate
+          required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        
+        **📋 What happens next?**
+        
+        1. This data will be automatically validated and processed
+        2. The production record will be added to the main database
+        3. Material inventory will be updated automatically
+        4. You'll receive a confirmation once processing is complete
+        
+        **🔄 Sync Status:** This entry will sync to the cloud when internet connection is available.
+        
+        **❓ Need Help?** Contact the system administrator if you have questions about any fields.
