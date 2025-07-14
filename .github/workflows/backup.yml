@@ -1,1 +1,375 @@
+name: Data Backup and Validation
 
+on:
+  schedule:
+    # Run daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  push:
+    paths:
+      - 'data/**'
+  workflow_dispatch:
+    inputs:
+      backup_type:
+        description: 'Type of backup to perform'
+        required: true
+        default: 'incremental'
+        type: choice
+        options:
+        - incremental
+        - full
+      retention_days:
+        description: 'Days to retain backup'
+        required: false
+        default: '30'
+        type: string
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for backup purposes
+          
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          
+      - name: Create backup directory
+        run: |
+          BACKUP_DATE=$(date +"%Y%m%d_%H%M%S")
+          BACKUP_TYPE="${{ github.event.inputs.backup_type || 'incremental' }}"
+          
+          echo "BACKUP_DATE=$BACKUP_DATE" >> $GITHUB_ENV
+          echo "BACKUP_TYPE=$BACKUP_TYPE" >> $GITHUB_ENV
+          
+          mkdir -p backups/$BACKUP_DATE
+          
+      - name: Validate data integrity
+        run: |
+          echo "🔍 Validating data integrity..."
+          
+          # Check if data directory exists
+          if [ ! -d "data" ]; then
+            echo "ℹ️ No data directory found, creating initial structure..."
+            mkdir -p data
+            echo "[]" > data/productions.json
+            echo "[]" > data/materials.json
+            echo "{}" > data/users.json
+            echo "{\"version\": \"2.0.0\", \"createdAt\": \"$(date -u +"%Y-%m-%dT%H:%M:%SZ")\"}" > data/config.json
+          fi
+          
+          # Validate JSON files
+          for file in data/*.json; do
+            if [ -f "$file" ]; then
+              echo "Validating $file..."
+              if jq empty "$file" 2>/dev/null; then
+                echo "✅ $file is valid JSON"
+              else
+                echo "❌ $file is invalid JSON"
+                exit 1
+              fi
+            fi
+          done
+          
+          echo "✅ Data integrity validation completed"
+          
+      - name: Generate backup metadata
+        run: |
+          echo "📋 Generating backup metadata..."
+          
+          # Get git information
+          GIT_COMMIT=$(git rev-parse HEAD)
+          GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+          GIT_AUTHOR=$(git log -1 --pretty=format:'%an <%ae>')
+          GIT_DATE=$(git log -1 --pretty=format:'%ci')
+          
+          # Calculate file checksums
+          cd data
+          find . -name "*.json" -type f -exec sha256sum {} \; > ../backups/$BACKUP_DATE/checksums.txt
+          cd ..
+          
+          # Count records in data files
+          PRODUCTIONS_COUNT=0
+          MATERIALS_COUNT=0
+          
+          if [ -f "data/productions.json" ]; then
+            PRODUCTIONS_COUNT=$(jq length data/productions.json 2>/dev/null || echo 0)
+          fi
+          
+          if [ -f "data/materials.json" ]; then
+            MATERIALS_COUNT=$(jq length data/materials.json 2>/dev/null || echo 0)
+          fi
+          
+          # Create backup metadata
+          cat > backups/$BACKUP_DATE/metadata.json << EOF
+          {
+            "backupDate": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")",
+            "backupType": "$BACKUP_TYPE",
+            "version": "2.0.0",
+            "git": {
+              "commit": "$GIT_COMMIT",
+              "branch": "$GIT_BRANCH",
+              "author": "$GIT_AUTHOR",
+              "date": "$GIT_DATE"
+            },
+            "statistics": {
+              "productionsCount": $PRODUCTIONS_COUNT,
+              "materialsCount": $MATERIALS_COUNT,
+              "totalFiles": $(find data -name "*.json" | wc -l)
+            },
+            "files": [
+              $(find data -name "*.json" -printf '"%p",' | sed 's/,$//')
+            ]
+          }
+          EOF
+          
+          echo "✅ Backup metadata generated"
+          
+      - name: Create data backup
+        run: |
+          echo "💾 Creating data backup..."
+          
+          # Copy data files
+          cp -r data/ backups/$BACKUP_DATE/
+          
+          # Create compressed archive
+          tar -czf backups/$BACKUP_DATE/data-backup.tar.gz -C data .
+          
+          # Generate backup summary
+          cat > backups/$BACKUP_DATE/README.md << EOF
+          # Pistachio Production Data Backup
+          
+          **Backup Date:** $(date -u +"%Y-%m-%d %H:%M:%S UTC")  
+          **Backup Type:** $BACKUP_TYPE  
+          **Total Size:** $(du -sh data | cut -f1)  
+          
+          ## Contents
+          
+          - \`data/\` - Raw data files
+          - \`data-backup.tar.gz\` - Compressed backup archive
+          - \`metadata.json\` - Backup metadata and statistics
+          - \`checksums.txt\` - File integrity checksums
+          
+          ## Statistics
+          
+          - Productions: $(jq length data/productions.json 2>/dev/null || echo 0) records
+          - Materials: $(jq length data/materials.json 2>/dev/null || echo 0) transactions
+          - Files: $(find data -name "*.json" | wc -l) JSON files
+          
+          ## Restoration
+          
+          To restore this backup:
+          
+          1. Extract the archive: \`tar -xzf data-backup.tar.gz\`
+          2. Verify checksums: \`sha256sum -c checksums.txt\`
+          3. Replace your data directory with the extracted files
+          
+          ## Verification
+          
+          All JSON files have been validated for syntax correctness.
+          Checksums are provided for integrity verification.
+          EOF
+          
+          echo "✅ Data backup created successfully"
+          
+      - name: Perform incremental backup
+        if: env.BACKUP_TYPE == 'incremental'
+        run: |
+          echo "🔄 Performing incremental backup..."
+          
+          # Find files changed in the last 24 hours
+          find data -name "*.json" -type f -mtime -1 > backups/$BACKUP_DATE/changed-files.txt
+          
+          if [ -s backups/$BACKUP_DATE/changed-files.txt ]; then
+            echo "📄 Changed files found:"
+            cat backups/$BACKUP_DATE/changed-files.txt
+            
+            # Create incremental archive with only changed files
+            tar -czf backups/$BACKUP_DATE/incremental-backup.tar.gz -T backups/$BACKUP_DATE/changed-files.txt
+            
+            echo "✅ Incremental backup completed"
+          else
+            echo "ℹ️ No files changed in the last 24 hours"
+            echo "[]" > backups/$BACKUP_DATE/changed-files.txt
+          fi
+          
+      - name: Validate backup integrity
+        run: |
+          echo "🔐 Validating backup integrity..."
+          
+          # Verify compressed archive
+          if [ -f "backups/$BACKUP_DATE/data-backup.tar.gz" ]; then
+            tar -tzf backups/$BACKUP_DATE/data-backup.tar.gz > /dev/null
+            echo "✅ Main backup archive is valid"
+          fi
+          
+          # Verify incremental archive if it exists
+          if [ -f "backups/$BACKUP_DATE/incremental-backup.tar.gz" ]; then
+            tar -tzf backups/$BACKUP_DATE/incremental-backup.tar.gz > /dev/null
+            echo "✅ Incremental backup archive is valid"
+          fi
+          
+          # Test JSON extraction and validation
+          cd backups/$BACKUP_DATE
+          mkdir -p test-restore
+          tar -xzf data-backup.tar.gz -C test-restore
+          
+          for file in test-restore/*.json; do
+            if [ -f "$file" ]; then
+              jq empty "$file"
+              echo "✅ $(basename "$file") validates after extraction"
+            fi
+          done
+          
+          cd ../..
+          rm -rf backups/$BACKUP_DATE/test-restore
+          
+          echo "✅ Backup integrity validation completed"
+          
+      - name: Clean old backups
+        run: |
+          echo "🧹 Cleaning old backups..."
+          
+          RETENTION_DAYS="${{ github.event.inputs.retention_days || '30' }}"
+          
+          # Find and remove backups older than retention period
+          find backups -type d -name "????????_??????" -mtime +$RETENTION_DAYS | while read old_backup; do
+            echo "Removing old backup: $old_backup"
+            rm -rf "$old_backup"
+          done
+          
+          # Keep only the 10 most recent backups regardless of date
+          ls -1t backups/ | grep "^[0-9]\{8\}_[0-9]\{6\}$" | tail -n +11 | while read old_backup; do
+            echo "Removing excess backup: backups/$old_backup"
+            rm -rf "backups/$old_backup"
+          done
+          
+          echo "✅ Old backup cleanup completed"
+          
+      - name: Generate backup report
+        run: |
+          echo "📊 Generating backup report..."
+          
+          BACKUP_SIZE=$(du -sh backups/$BACKUP_DATE | cut -f1)
+          TOTAL_BACKUPS=$(find backups -type d -name "????????_??????" | wc -l)
+          TOTAL_SIZE=$(du -sh backups | cut -f1)
+          
+          cat > backup-report.md << EOF
+          # Backup Report - $(date +"%Y-%m-%d")
+          
+          ## Summary
+          
+          - **Backup ID:** $BACKUP_DATE
+          - **Type:** $BACKUP_TYPE
+          - **Status:** ✅ Successful
+          - **Size:** $BACKUP_SIZE
+          - **Duration:** $(date +%s) seconds
+          
+          ## Statistics
+          
+          - **Total Backups:** $TOTAL_BACKUPS
+          - **Total Storage Used:** $TOTAL_SIZE
+          - **Productions Backed Up:** $(jq length data/productions.json 2>/dev/null || echo 0)
+          - **Material Transactions:** $(jq length data/materials.json 2>/dev/null || echo 0)
+          
+          ## Files Backed Up
+          
+          $(find data -name "*.json" -exec echo "- {}" \;)
+          
+          ## Next Steps
+          
+          - Backup stored in: \`backups/$BACKUP_DATE/\`
+          - Retention: ${{ github.event.inputs.retention_days || '30' }} days
+          - Next scheduled backup: $(date -d "+1 day" +"%Y-%m-%d 02:00 UTC")
+          
+          EOF
+          
+          echo "✅ Backup report generated"
+          
+      - name: Commit backup to repository
+        run: |
+          echo "💾 Committing backup to repository..."
+          
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          
+          git add backups/$BACKUP_DATE/
+          git add backup-report.md
+          
+          if git diff --staged --quiet; then
+            echo "ℹ️ No changes to commit"
+          else
+            git commit -m "🔄 Automated backup: $BACKUP_DATE ($BACKUP_TYPE)"
+            git push
+            echo "✅ Backup committed to repository"
+          fi
+          
+      - name: Create backup artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pistachio-backup-${{ env.BACKUP_DATE }}
+          path: backups/${{ env.BACKUP_DATE }}/
+          retention-days: ${{ github.event.inputs.retention_days || 30 }}
+          
+      - name: Notify on failure
+        if: failure()
+        run: |
+          echo "❌ Backup failed!"
+          echo "Please check the workflow logs for details."
+          
+          # You could add notification logic here (Slack, email, etc.)
+          
+  # Data validation job
+  validate:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && contains(github.event.head_commit.modified, 'data/')
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        
+      - name: Validate modified data files
+        run: |
+          echo "🔍 Validating modified data files..."
+          
+          # Get list of modified files in data directory
+          git diff --name-only HEAD~1 HEAD | grep "^data/.*\.json$" | while read file; do
+            if [ -f "$file" ]; then
+              echo "Validating $file..."
+              if jq empty "$file"; then
+                echo "✅ $file is valid JSON"
+              else
+                echo "❌ $file is invalid JSON"
+                exit 1
+              fi
+            fi
+          done
+          
+          echo "✅ All modified data files are valid"
+          
+      - name: Check data consistency
+        run: |
+          echo "🔗 Checking data consistency..."
+          
+          # Add custom data consistency checks here
+          # For example, check that all production IDs are unique
+          
+          if [ -f "data/productions.json" ]; then
+            PRODUCTION_IDS=$(jq -r '.[].id' data/productions.json | sort)
+            UNIQUE_IDS=$(echo "$PRODUCTION_IDS" | uniq)
+            
+            if [ "$(echo "$PRODUCTION_IDS" | wc -l)" != "$(echo "$UNIQUE_IDS" | wc -l)" ]; then
+              echo "❌ Duplicate production IDs found!"
+              exit 1
+            else
+              echo "✅ All production IDs are unique"
+            fi
+          fi
+          
+          echo "✅ Data consistency checks passed"
