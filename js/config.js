@@ -6,8 +6,8 @@
 const Config = {
     // GitHub OAuth Configuration
     github: {
-        clientId: 'Iv1.Ov23lizH9QoqwmOf0JD8',           // Your OAuth Client ID
-        redirectUri: window.location.origin + window.location.pathname,
+        clientId: 'Ov23lizH9QoqwmOf0JD8',           // CORRECTED: Use the actual Client ID from OAuth app
+        redirectUri: 'https://akapp611.github.io/pistachio-production-demo/', // CORRECTED: Fixed URL
         scopes: 'repo',
         repo: 'AKAPP611/pistachio-production-demo',     // Your repository
         branch: 'main',
@@ -59,13 +59,13 @@ const Config = {
     security: {
         enableCSRFProtection: true,
         enableXSSProtection: true,
-        enableTokenEncryption: true,
-        allowedOrigins: [window.location.origin]
+        enableTokenEncryption: false, // CHANGED: Disabled problematic encryption
+        allowedOrigins: ['https://akapp611.github.io'] // CORRECTED: Fixed origin
     },
     
     // Development Configuration
     dev: {
-        enableDebugLogging: false,
+        enableDebugLogging: true, // CHANGED: Enable for troubleshooting
         enableMockData: false,
         bypassAuthentication: false
     },
@@ -111,7 +111,7 @@ const Config = {
 // Environment-specific overrides
 if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
     Config.dev.enableDebugLogging = true;
-    Config.github.redirectUri = 'http://localhost:3000'; // Adjust for local development
+    Config.github.redirectUri = 'http://localhost:3000'; // For local development
 }
 
 // Freeze configuration to prevent runtime modifications
