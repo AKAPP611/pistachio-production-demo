@@ -1184,6 +1184,40 @@ if ('serviceWorker' in navigator) {
             });
     });
 }
+       <script>
+// Temporary fix for login button
+function handleGitHubLogin() {
+    console.log('Login button clicked');
+    
+    if (window.GitHubAuth && typeof window.GitHubAuth.login === 'function') {
+        window.GitHubAuth.login();
+    } else {
+        console.error('GitHubAuth not available');
+        
+        // Manual OAuth redirect as fallback
+        const clientId = 'Iv1.Ov23lizH9QoqwmOf0JD8';
+        const redirectUri = window.location.origin + window.location.pathname;
+        const scope = 'repo';
+        const state = Math.random().toString(36).substr(2, 9);
+        
+        sessionStorage.setItem('oauth_state', state);
+        
+        const authUrl = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${scope}&state=${state}`;
+        
+        console.log('Redirecting to:', authUrl);
+        window.location.href = authUrl;
+    }
+}
+
+// Update the login button onclick
+document.addEventListener('DOMContentLoaded', () => {
+    const loginBtn = document.getElementById('githubLoginBtn');
+    if (loginBtn) {
+        loginBtn.onclick = handleGitHubLogin;
+        console.log('Login button handler updated');
+    }
+});
+</script>
 </script>
 </body>
 </html>
