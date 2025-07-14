@@ -9,7 +9,7 @@ const Config = {
         clientId: 'Iv1. Ov23lizH9QoqwmOf0JD8',              // Your OAuth , // 
         redirectUri: window.location.origin + window.location.pathname,
         scopes: 'repo',
-        repo: 'https://github.com/AKAPP611/pistachio-production-demo', // Replace with your repository
+        repo: 'AKAPP611/pistachio-production-demo', // Replace with your repository
         branch: 'main',
         apiUrl: 'https://api.github.com'
     },
