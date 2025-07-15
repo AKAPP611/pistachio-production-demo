@@ -13,6 +13,18 @@
             box-sizing: border-box;
         }
         
+        /* Dynamic viewport for mobile */
+        :root {
+            --vh: 1vh;
+        }
+        
+        @media screen and (max-width: 768px) {
+            .container {
+                min-height: calc(var(--vh, 1vh) * 100 - 120px);
+                padding-bottom: env(safe-area-inset-bottom, 20px);
+            }
+        }
+        
         body {
             font-family: Arial, sans-serif;
             background-color: #f5f5f5;
