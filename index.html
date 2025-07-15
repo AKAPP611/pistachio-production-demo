@@ -1217,6 +1217,140 @@ if ('serviceWorker' in navigator) {
             });
     });
 }
+
+// Mobile fullscreen experience
+(function() {
+    'use strict';
+    
+    let isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    let isAndroid = /Android/.test(navigator.userAgent);
+    let isMobile = isIOS || isAndroid || window.innerWidth <= 768;
+    
+    function initMobileFullscreen() {
+        if (!isMobile) return;
+        
+        // Add PWA detection
+        let isPWA = window.matchMedia('(display-mode: fullscreen)').matches || 
+                   window.matchMedia('(display-mode: standalone)').matches ||
+                   window.navigator.standalone === true;
+        
+        if (isPWA) {
+            document.body.classList.add('pwa-fullscreen');
+            console.log('🚀 Running in PWA fullscreen mode');
+        }
+        
+        // Handle iOS Safari address bar hiding
+        if (isIOS) {
+            // Set initial viewport height
+            let vh = window.innerHeight * 0.01;
+            document.documentElement.style.setProperty('--vh', `${vh}px`);
+            
+            // Hide address bar on scroll
+            let hideAddressBar = () => {
+                if (!isPWA) {
+                    window.scrollTo(0, 1);
+                }
+            };
+            
+            // Execute on load and resize
+            window.addEventListener('load', hideAddressBar);
+            window.addEventListener('orientationchange', () => {
+                setTimeout(() => {
+                    hideAddressBar();
+                    let vh = window.innerHeight * 0.01;
+                    document.documentElement.style.setProperty('--vh', `${vh}px`);
+                }, 100);
+            });
+        }
+        
+        // Handle Android Chrome
+        if (isAndroid && !isPWA) {
+            // Request fullscreen API if available
+            let requestFullscreen = () => {
+                let docEl = document.documentElement;
+                let requestMethod = docEl.requestFullscreen || 
+                                  docEl.webkitRequestFullscreen || 
+                                  docEl.mozRequestFullScreen || 
+                                  docEl.msRequestFullscreen;
+                
+                if (requestMethod) {
+                    // Don't auto-request fullscreen, but make it available
+                    window.goFullscreen = () => requestMethod.call(docEl);
+                }
+            };
+            
+            requestFullscreen();
+        }
+        
+        // Prevent zoom on double tap
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function (event) {
+            let now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+        
+        // Prevent pull-to-refresh (but keep it for data sync)
+        let startY = 0;
+        document.addEventListener('touchstart', e => {
+            startY = e.touches[0].clientY;
+        });
+        
+        document.addEventListener('touchmove', e => {
+            let currentY = e.touches[0].clientY;
+            if (startY < currentY && window.pageYOffset === 0) {
+                // Only prevent if not intentionally refreshing
+                if (currentY - startY > 50) {
+                    // Allow pull-to-refresh for sync
+                    return;
+                } else {
+                    e.preventDefault();
+                }
+            }
+        });
+        
+        console.log(`📱 Mobile fullscreen initialized - iOS: ${isIOS}, Android: ${isAndroid}, PWA: ${isPWA}`);
+    }
+    
+    // Initialize when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initMobileFullscreen);
+    } else {
+        initMobileFullscreen();
+    }
+    
+    // Add fullscreen toggle button for testing (only on mobile)
+    if (isMobile && !window.matchMedia('(display-mode: standalone)').matches) {
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                // Add a small fullscreen button to header
+                let header = document.querySelector('.header');
+                if (header && window.goFullscreen) {
+                    let fullscreenBtn = document.createElement('button');
+                    fullscreenBtn.innerHTML = '⛶';
+                    fullscreenBtn.title = 'Toggle Fullscreen';
+                    fullscreenBtn.style.cssText = `
+                        position: absolute;
+                        top: 10px;
+                        right: 10px;
+                        background: rgba(255,255,255,0.2);
+                        border: 1px solid rgba(255,255,255,0.3);
+                        color: white;
+                        padding: 5px 8px;
+                        border-radius: 4px;
+                        font-size: 14px;
+                        cursor: pointer;
+                    `;
+                    fullscreenBtn.addEventListener('click', window.goFullscreen);
+                    header.style.position = 'relative';
+                    header.appendChild(fullscreenBtn);
+                }
+            }, 2000);
+        });
+    }
+})();
 </script>
        <script>
 // Debug script loading
