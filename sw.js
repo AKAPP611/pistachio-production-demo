@@ -293,6 +293,15 @@ self.addEventListener('message', (event) => {
                 // Register background sync
                 self.registration.sync.register('pistachio-data-sync');
                 break;
+            case 'FULLSCREEN_MODE':
+                // Handle fullscreen mode changes
+                console.log('[ServiceWorker] Fullscreen mode:', event.data.enabled);
+                // Could trigger specific caching or notifications
+                break;
+            case 'PWA_INSTALLED':
+                // Handle PWA installation
+                console.log('[ServiceWorker] PWA installed in fullscreen mode');
+                break;
         }
     }
 });
