@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
 <title>Pistachio Production Management</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#2c7a2c">
@@ -17,6 +17,39 @@
             font-family: Arial, sans-serif;
             background-color: #f5f5f5;
             color: #333;
+            /* Mobile fullscreen support */
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+            margin: 0;
+            overflow-x: hidden;
+        }
+        
+        /* PWA fullscreen styles */
+        body.pwa-fullscreen {
+            padding-top: env(safe-area-inset-top, 20px);
+        }
+        
+        /* Mobile browser detection and fullscreen */
+        @media screen and (max-width: 768px) {
+            html {
+                height: -webkit-fill-available;
+            }
+            
+            body {
+                min-height: 100vh;
+                min-height: -webkit-fill-available;
+            }
+            
+            /* Hide address bar on scroll for mobile browsers */
+            body.hide-bars {
+                height: 100vh;
+                height: -webkit-fill-available;
+                overflow: hidden;
+            }
+        }
+        
+        /* Status bar styling for notched devices */
+        .header {
+            padding-top: calc(20px + env(safe-area-inset-top, 0px));
         }
         
         .header {
