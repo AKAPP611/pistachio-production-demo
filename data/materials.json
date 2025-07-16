@@ -18,5 +18,15 @@
     "reference": "Manual addition",
     "user": "AKAPP611",
     "createdAt": "2025-07-16T12:40:29.538Z"
+  },
+  {
+    "id": 1752669630539,
+    "date": "2025-07-16",
+    "materialType": "plasticBags",
+    "transactionType": "added",
+    "quantity": 20000,
+    "reference": "Manual addition",
+    "user": "AKAPP611",
+    "createdAt": "2025-07-16T12:40:30.539Z"
   }
 ]
