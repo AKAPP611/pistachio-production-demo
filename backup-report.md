@@ -1,19 +1,19 @@
-# Backup Report - 2025-07-15
+# Backup Report - 2025-07-17
 
 ## Summary
 
-- **Backup ID:** 20250715_042542
+- **Backup ID:** 20250717_042304
 - **Type:** incremental
 - **Status:** ✅ Successful
 - **Size:** 40K
-- **Duration:** 1752553542 seconds
+- **Duration:** 1752726184 seconds
 
 ## Statistics
 
-- **Total Backups:** 2
-- **Total Storage Used:** 84K
-- **Productions Backed Up:** 0
-- **Material Transactions:** 0
+- **Total Backups:** 3
+- **Total Storage Used:** 124K
+- **Productions Backed Up:** 2
+- **Material Transactions:** 9
 
 ## Files Backed Up
 
@@ -22,7 +22,7 @@
 
 ## Next Steps
 
-- Backup stored in: `backups/20250715_042542/`
+- Backup stored in: `backups/20250717_042304/`
 - Retention: 30 days
-- Next scheduled backup: 2025-07-16 02:00 UTC
+- Next scheduled backup: 2025-07-18 02:00 UTC
 
