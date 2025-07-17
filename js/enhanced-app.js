@@ -1029,7 +1029,7 @@ function displayMaterialTransactions() {
     const filterType = document.getElementById('filterMaterialType').value;
     const filterDate = document.getElementById('filterMaterialDate').value;
     
-    let filtered = materialTransactions;
+    let filtered = window.materialTransactions || [];
     
     if (filterType) {
         filtered = filtered.filter(t => t.materialType === filterType);
@@ -1049,6 +1049,12 @@ function displayMaterialTransactions() {
         const typeStyle = trans.transactionType === 'added' || trans.transactionType === 'returned' ? 'color: green;' : 'color: red;';
         const quantityDisplay = trans.transactionType === 'added' || trans.transactionType === 'returned' ? `+${Math.abs(trans.quantity)}` : trans.quantity;
         
+        // Determine if transaction can be deleted (don't delete production-related transactions)
+        const canDelete = trans.transactionType === 'added' || trans.transactionType === 'returned';
+        const deleteButton = canDelete ? 
+            `<button class="delete-btn" onclick="deleteMaterialTransaction(${trans.id})" title="Delete Transaction">🗑️</button>` :
+            `<span style="color: #999; font-size: 0.8em;">Protected</span>`;
+        
         row.innerHTML = `
             <td>${new Date(trans.date).toLocaleDateString()}</td>
             <td>${materialName}</td>
@@ -1056,10 +1062,20 @@ function displayMaterialTransactions() {
             <td style="${typeStyle}"><strong>${quantityDisplay}</strong></td>
             <td>${trans.reference}</td>
             <td>${trans.user}</td>
+            <td>${deleteButton}</td>
         `;
     });
+    
+    // Show message if no transactions
+    if (filtered.length === 0) {
+        const row = tbody.insertRow();
+        row.innerHTML = `
+            <td colspan="7" style="text-align: center; padding: 20px; color: #666;">
+                No material transactions found
+            </td>
+        `;
+    }
 }
-
 // Export inventory
 function exportInventory() {
     let csv = 'Product,Quantity (kg)\n';
