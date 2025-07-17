@@ -1,5 +1,25 @@
 [
   {
+    "id": 1752756660836,
+    "date": "2025-07-17",
+    "materialType": "plasticBags",
+    "transactionType": "used",
+    "quantity": -1680,
+    "reference": "Production: Repacking_Lot_10_25_AK_17_2025",
+    "user": "AKAPP611",
+    "createdAt": "2025-07-17T12:51:00.836Z"
+  },
+  {
+    "id": 1752756660838,
+    "date": "2025-07-17",
+    "materialType": "boxesGolden",
+    "transactionType": "used",
+    "quantity": -1680,
+    "reference": "Production: Repacking_Lot_10_25_AK_17_2025",
+    "user": "AKAPP611",
+    "createdAt": "2025-07-17T12:51:00.836Z"
+  },
+  {
     "id": 1752738192175,
     "date": "2025-07-17",
     "materialType": "plasticBags",
