@@ -253,14 +253,14 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
-      yaml- name: Deploy to GitHub Pages
-  id: deployment
-  uses: actions/deploy-pages@v3
-  with:
-    timeout: 600000
-    error_count: 10
-    reporting_interval: 5000
-    token: ${{ github.token }}
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v3
+        with:
+          timeout: 600000
+          error_count: 10
+          reporting_interval: 5000
+          token: ${{ github.token }}
         
       - name: Create deployment notification
         if: success()
