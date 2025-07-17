@@ -505,6 +505,123 @@ async function addMaterials(event) {
     updateInventory();
     updateMaterialStockDisplay();
 }
+// Delete material transaction
+async function deleteMaterialTransaction(transactionId) {
+    try {
+        // Find the transaction to delete
+        const transactionIndex = window.materialTransactions.findIndex(t => t.id === transactionId);
+        
+        if (transactionIndex === -1) {
+            alert('Transaction not found!');
+            return;
+        }
+        
+        const transaction = window.materialTransactions[transactionIndex];
+        
+        // Check if it's a production-related transaction (protect from deletion)
+        if (transaction.transactionType === 'used' || transaction.transactionType === 'wasted') {
+            alert('❌ Cannot delete production-related transactions!\n\nTo modify material usage, edit the production record instead.');
+            return;
+        }
+        
+        // Show confirmation dialog
+        const materialName = transaction.materialType === 'plasticBags' ? 'Plastic Bags' : 
+                           transaction.materialType === 'boxesGolden' ? 'Boxes - Golden' :
+                           transaction.materialType === 'boxesExtra' ? 'Boxes - Extra' : 'Pallets';
+        
+        const quantityDisplay = transaction.transactionType === 'added' || transaction.transactionType === 'returned' ? 
+            `+${Math.abs(transaction.quantity)}` : transaction.quantity;
+        
+        const confirmDelete = confirm(`🗑️ Delete Material Transaction?
+        
+Material: ${materialName}
+Type: ${transaction.transactionType}
+Quantity: ${quantityDisplay}
+Date: ${new Date(transaction.date).toLocaleDateString()}
+Reference: ${transaction.reference}
+
+⚠️ This action cannot be undone and will affect your current material stock!
+
+Are you sure you want to delete this transaction?`);
+        
+        if (!confirmDelete) {
+            return;
+        }
+        
+        // Remove the transaction from the array
+        window.materialTransactions.splice(transactionIndex, 1);
+        
+        // Save to all storage systems
+        const saveSuccess = saveToAllStorages('materialTransactions', window.materialTransactions);
+        
+        if (saveSuccess) {
+            // Update all displays
+            updateMaterialsView();
+            updateInventory();
+            updateMaterialStockDisplay();
+            updateDashboard();
+            
+            // Show success message
+            alert('✅ Material transaction deleted successfully!');
+            
+            console.log(`🗑️ Deleted material transaction: ${transaction.id}`);
+        } else {
+            alert('⚠️ Transaction deleted locally but may not sync to cloud. Please check your connection.');
+        }
+        
+    } catch (error) {
+        console.error('Failed to delete material transaction:', error);
+        alert('❌ Failed to delete transaction. Please try again.');
+    }
+}
+
+// Bulk delete material transactions (bonus feature)
+function deleteMaterialTransactionsBulk() {
+    const confirmed = confirm(`🗑️ Delete ALL Manual Material Transactions?
+    
+This will delete ALL manually added material transactions, but will keep production-related transactions.
+
+⚠️ This action cannot be undone!
+
+Are you sure you want to continue?`);
+    
+    if (!confirmed) return;
+    
+    try {
+        // Count transactions before deletion
+        const originalCount = window.materialTransactions.length;
+        
+        // Keep only production-related transactions
+        window.materialTransactions = window.materialTransactions.filter(t => 
+            t.transactionType === 'used' || t.transactionType === 'wasted'
+        );
+        
+        const deletedCount = originalCount - window.materialTransactions.length;
+        
+        if (deletedCount === 0) {
+            alert('ℹ️ No manual transactions found to delete.');
+            return;
+        }
+        
+        // Save to all storage systems
+        const saveSuccess = saveToAllStorages('materialTransactions', window.materialTransactions);
+        
+        if (saveSuccess) {
+            // Update all displays
+            updateMaterialsView();
+            updateInventory();
+            updateMaterialStockDisplay();
+            updateDashboard();
+            
+            alert(`✅ Successfully deleted ${deletedCount} manual material transactions!`);
+        } else {
+            alert('⚠️ Transactions deleted locally but may not sync to cloud.');
+        }
+        
+    } catch (error) {
+        console.error('Failed to bulk delete transactions:', error);
+        alert('❌ Failed to delete transactions. Please try again.');
+    }
 
 // All other functions remain largely the same but with enhanced error handling and sync capabilities
 // Including: migrateOldBoxData, updateDashboard, updateInventory, displayRecords, etc.
