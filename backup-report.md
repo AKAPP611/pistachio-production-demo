@@ -2,18 +2,18 @@
 
 ## Summary
 
-- **Backup ID:** 20250717_125110
+- **Backup ID:** 20250717_125706
 - **Type:** incremental
 - **Status:** ✅ Successful
 - **Size:** 48K
-- **Duration:** 1752756670 seconds
+- **Duration:** 1752757026 seconds
 
 ## Statistics
 
-- **Total Backups:** 8
-- **Total Storage Used:** 332K
-- **Productions Backed Up:** 5
-- **Material Transactions:** 16
+- **Total Backups:** 9
+- **Total Storage Used:** 380K
+- **Productions Backed Up:** 6
+- **Material Transactions:** 18
 
 ## Files Backed Up
 
@@ -22,7 +22,7 @@
 
 ## Next Steps
 
-- Backup stored in: `backups/20250717_125110/`
+- Backup stored in: `backups/20250717_125706/`
 - Retention: 30 days
 - Next scheduled backup: 2025-07-18 02:00 UTC
 
