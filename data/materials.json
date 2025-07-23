@@ -178,5 +178,25 @@
     "reference": "Manual addition",
     "user": "AKAPP611",
     "createdAt": "2025-07-15T08:43:17.577Z"
+  },
+  {
+    "id": 1752815039894,
+    "date": "2025-07-17",
+    "materialType": "plasticBags",
+    "transactionType": "used",
+    "quantity": -1840,
+    "reference": "Production: Repacking_Lot_10_25_CH_17_2025",
+    "user": "AKAPP611",
+    "createdAt": "2025-07-18T05:03:59.893Z"
+  },
+  {
+    "id": 1752815039895,
+    "date": "2025-07-17",
+    "materialType": "boxesGolden",
+    "transactionType": "used",
+    "quantity": -1840,
+    "reference": "Production: Repacking_Lot_10_25_CH_17_2025",
+    "user": "AKAPP611",
+    "createdAt": "2025-07-18T05:03:59.893Z"
   }
 ]
