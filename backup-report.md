@@ -2,18 +2,18 @@
 
 ## Summary
 
-- **Backup ID:** 20250729_043704
+- **Backup ID:** 20250729_111531
 - **Type:** incremental
 - **Status:** ✅ Successful
 - **Size:** 48K
-- **Duration:** 1753763825 seconds
+- **Duration:** 1753787731 seconds
 
 ## Statistics
 
 - **Total Backups:** 10
 - **Total Storage Used:** 484K
-- **Productions Backed Up:** 6
-- **Material Transactions:** 18
+- **Productions Backed Up:** 7
+- **Material Transactions:** 24
 
 ## Files Backed Up
 
@@ -22,7 +22,7 @@
 
 ## Next Steps
 
-- Backup stored in: `backups/20250729_043704/`
+- Backup stored in: `backups/20250729_111531/`
 - Retention: 30 days
 - Next scheduled backup: 2025-07-30 02:00 UTC
 
