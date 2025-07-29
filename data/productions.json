@@ -214,5 +214,42 @@
     },
     "operator": "AKAPP611",
     "createdAt": "2025-07-16T12:43:44.190Z"
+  },
+  {
+    "id": 1753787710797,
+    "date": "2025-07-26",
+    "lotNumber": "Lot_10_25_AK_28_2025",
+    "inputType": "huller",
+    "inputWeight": 200000,
+    "output": {
+      "21-25": 80000,
+      "18-21": 80000
+    },
+    "rejects": {
+      "looseShell": 4444,
+      "shellSplit": 4444,
+      "undersize": 4444,
+      "darkStain": 4444,
+      "adheringHull": 4444,
+      "lightStain": 4444,
+      "looseKernel": 4444,
+      "dust": 4444,
+      "nonSplit": 5000
+    },
+    "materials": {
+      "plasticBagsUsed": 16000,
+      "boxTypeUsed": "extra",
+      "boxesUsed": 15600,
+      "boxesGoldenUsed": 0,
+      "boxesExtraUsed": 15600,
+      "palletsUsed": 0,
+      "plasticBagsWasted": 20,
+      "boxTypeWasted": "golden",
+      "boxesWasted": 20,
+      "boxesGoldenWasted": 20,
+      "boxesExtraWasted": 0
+    },
+    "operator": "AKAPP611",
+    "createdAt": "2025-07-29T11:15:10.797Z"
   }
 ]
