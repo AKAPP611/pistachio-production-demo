@@ -1,5 +1,45 @@
 [
   {
+    "id": 1753787712017,
+    "date": "2025-07-26",
+    "materialType": "boxesGolden",
+    "transactionType": "wasted",
+    "quantity": -20,
+    "reference": "Wastage: Lot_10_25_AK_28_2025",
+    "user": "AKAPP611",
+    "createdAt": "2025-07-29T11:15:12.012Z"
+  },
+  {
+    "id": 1753787712012,
+    "date": "2025-07-26",
+    "materialType": "plasticBags",
+    "transactionType": "used",
+    "quantity": -16000,
+    "reference": "Production: Lot_10_25_AK_28_2025",
+    "user": "AKAPP611",
+    "createdAt": "2025-07-29T11:15:12.011Z"
+  },
+  {
+    "id": 1753787712013,
+    "date": "2025-07-26",
+    "materialType": "boxesExtra",
+    "transactionType": "used",
+    "quantity": -15600,
+    "reference": "Production: Lot_10_25_AK_28_2025",
+    "user": "AKAPP611",
+    "createdAt": "2025-07-29T11:15:12.011Z"
+  },
+  {
+    "id": 1753787712015,
+    "date": "2025-07-26",
+    "materialType": "plasticBags",
+    "transactionType": "wasted",
+    "quantity": -20,
+    "reference": "Wastage: Lot_10_25_AK_28_2025",
+    "user": "AKAPP611",
+    "createdAt": "2025-07-29T11:15:12.011Z"
+  },
+  {
     "id": 1753786113186,
     "date": "2025-07-29",
     "materialType": "boxesGolden",
