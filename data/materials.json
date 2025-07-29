@@ -1,5 +1,15 @@
 [
   {
+    "id": 1753786113186,
+    "date": "2025-07-29",
+    "materialType": "boxesGolden",
+    "transactionType": "added",
+    "quantity": 1000,
+    "reference": "Manual addition",
+    "user": "AKAPP611",
+    "createdAt": "2025-07-29T10:48:33.186Z"
+  },
+  {
     "id": 1753786112034,
     "date": "2025-07-29",
     "materialType": "boxesGolden",
