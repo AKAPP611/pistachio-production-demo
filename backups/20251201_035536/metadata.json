@@ -1,0 +1,19 @@
+{
+  "backupDate": "2025-12-01T03:55:36Z",
+  "backupType": "incremental",
+  "version": "2.0.0",
+  "git": {
+    "commit": "233b2cb50b8d33942ab5b96717e80966fb54b351",
+    "branch": "main",
+    "author": "GitHub Action <action@github.com>",
+    "date": "2025-11-30 03:39:48 +0000"
+  },
+  "statistics": {
+    "productionsCount": 7,
+    "materialsCount": 24,
+    "totalFiles": 2
+  },
+  "files": [
+    "data/productions.json","data/materials.json"
+  ]
+}
