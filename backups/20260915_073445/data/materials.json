@@ -1,0 +1,242 @@
+[
+  {
+    "id": 1753787712017,
+    "date": "2025-07-26",
+    "materialType": "boxesGolden",
+    "transactionType": "wasted",
+    "quantity": -20,
+    "reference": "Wastage: Lot_10_25_AK_28_2025",
+    "user": "AKAPP611",
+    "createdAt": "2025-07-29T11:15:12.012Z"
+  },
+  {
+    "id": 1753787712012,
+    "date": "2025-07-26",
+    "materialType": "plasticBags",
+    "transactionType": "used",
+    "quantity": -16000,
+    "reference": "Production: Lot_10_25_AK_28_2025",
+    "user": "AKAPP611",
+    "createdAt": "2025-07-29T11:15:12.011Z"
+  },
+  {
+    "id": 1753787712013,
+    "date": "2025-07-26",
+    "materialType": "boxesExtra",
+    "transactionType": "used",
+    "quantity": -15600,
+    "reference": "Production: Lot_10_25_AK_28_2025",
+    "user": "AKAPP611",
+    "createdAt": "2025-07-29T11:15:12.011Z"
+  },
+  {
+    "id": 1753787712015,
+    "date": "2025-07-26",
+    "materialType": "plasticBags",
+    "transactionType": "wasted",
+    "quantity": -20,
+    "reference": "Wastage: Lot_10_25_AK_28_2025",
+    "user": "AKAPP611",
+    "createdAt": "2025-07-29T11:15:12.011Z"
+  },
+  {
+    "id": 1753786113186,
+    "date": "2025-07-29",
+    "materialType": "boxesGolden",
+    "transactionType": "added",
+    "quantity": 1000,
+    "reference": "Manual addition",
+    "user": "AKAPP611",
+    "createdAt": "2025-07-29T10:48:33.186Z"
+  },
+  {
+    "id": 1753786112034,
+    "date": "2025-07-29",
+    "materialType": "boxesGolden",
+    "transactionType": "added",
+    "quantity": 1000,
+    "reference": "Manual addition",
+    "user": "AKAPP611",
+    "createdAt": "2025-07-29T10:48:32.034Z"
+  },
+  {
+    "id": 1752756893449,
+    "date": "2025-07-17",
+    "materialType": "plasticBags",
+    "transactionType": "used",
+    "quantity": -630,
+    "reference": "Production: Repacking_Lot_10_25_ALI_17_2025",
+    "user": "AKAPP611",
+    "createdAt": "2025-07-17T12:54:53.448Z"
+  },
+  {
+    "id": 1752756893450,
+    "date": "2025-07-17",
+    "materialType": "boxesGolden",
+    "transactionType": "used",
+    "quantity": -630,
+    "reference": "Production: Repacking_Lot_10_25_ALI_17_2025",
+    "user": "AKAPP611",
+    "createdAt": "2025-07-17T12:54:53.448Z"
+  },
+  {
+    "id": 1752756660836,
+    "date": "2025-07-17",
+    "materialType": "plasticBags",
+    "transactionType": "used",
+    "quantity": -1680,
+    "reference": "Production: Repacking_Lot_10_25_AK_17_2025",
+    "user": "AKAPP611",
+    "createdAt": "2025-07-17T12:51:00.836Z"
+  },
+  {
+    "id": 1752756660838,
+    "date": "2025-07-17",
+    "materialType": "boxesGolden",
+    "transactionType": "used",
+    "quantity": -1680,
+    "reference": "Production: Repacking_Lot_10_25_AK_17_2025",
+    "user": "AKAPP611",
+    "createdAt": "2025-07-17T12:51:00.836Z"
+  },
+  {
+    "id": 1752738192175,
+    "date": "2025-07-17",
+    "materialType": "plasticBags",
+    "transactionType": "used",
+    "quantity": -2005,
+    "reference": "Production: Repacking_Lot_10_25_ABM_17_2025",
+    "user": "AKAPP611",
+    "createdAt": "2025-07-17T07:43:12.174Z"
+  },
+  {
+    "id": 1752738192176,
+    "date": "2025-07-17",
+    "materialType": "boxesExtra",
+    "transactionType": "used",
+    "quantity": -2005,
+    "reference": "Production: Repacking_Lot_10_25_ABM_17_2025",
+    "user": "AKAPP611",
+    "createdAt": "2025-07-17T07:43:12.174Z"
+  },
+  {
+    "id": 1752738184091,
+    "date": "2025-07-17",
+    "materialType": "boxesExtra",
+    "transactionType": "added",
+    "quantity": 20000,
+    "reference": "Manual addition",
+    "user": "AKAPP611",
+    "createdAt": "2025-07-17T07:43:04.091Z"
+  },
+  {
+    "id": 1752736350602,
+    "date": "2025-07-16",
+    "materialType": "plasticBags",
+    "transactionType": "used",
+    "quantity": -1680,
+    "reference": "Production: Repacking_Lot_10_25_CH_16_2025",
+    "user": "AKAPP611",
+    "createdAt": "2025-07-17T07:12:30.601Z"
+  },
+  {
+    "id": 1752736350603,
+    "date": "2025-07-16",
+    "materialType": "boxesGolden",
+    "transactionType": "used",
+    "quantity": -1680,
+    "reference": "Production: Repacking_Lot_10_25_CH_16_2025",
+    "user": "AKAPP611",
+    "createdAt": "2025-07-17T07:12:30.601Z"
+  },
+  {
+    "id": 1752669973742,
+    "date": "2025-07-16",
+    "materialType": "plasticBags",
+    "transactionType": "used",
+    "quantity": -1120,
+    "reference": "Production: Repacking_Lot_10_25_CH_15_2025",
+    "user": "AKAPP611",
+    "createdAt": "2025-07-16T12:46:13.741Z"
+  },
+  {
+    "id": 1752669973743,
+    "date": "2025-07-16",
+    "materialType": "boxesGolden",
+    "transactionType": "used",
+    "quantity": -1120,
+    "reference": "Production: Repacking_Lot_10_25_CH_15_2025",
+    "user": "AKAPP611",
+    "createdAt": "2025-07-16T12:46:13.741Z"
+  },
+  {
+    "id": 1752669825233,
+    "date": "2025-07-16",
+    "materialType": "plasticBags",
+    "transactionType": "used",
+    "quantity": -1200,
+    "reference": "Production: Repacking_Lot_10_25",
+    "user": "AKAPP611",
+    "createdAt": "2025-07-16T12:43:45.232Z"
+  },
+  {
+    "id": 1752669825234,
+    "date": "2025-07-16",
+    "materialType": "boxesGolden",
+    "transactionType": "used",
+    "quantity": -1200,
+    "reference": "Production: Repacking_Lot_10_25",
+    "user": "AKAPP611",
+    "createdAt": "2025-07-16T12:43:45.232Z"
+  },
+  {
+    "id": 1752669748649,
+    "date": "2025-07-16",
+    "materialType": "boxesGolden",
+    "transactionType": "added",
+    "quantity": 20000,
+    "reference": "Manual addition",
+    "user": "AKAPP611",
+    "createdAt": "2025-07-16T12:42:28.649Z"
+  },
+  {
+    "id": 1752669633072,
+    "date": "2025-07-16",
+    "materialType": "plasticBags",
+    "transactionType": "added",
+    "quantity": 20000,
+    "reference": "Manual addition",
+    "user": "AKAPP611",
+    "createdAt": "2025-07-16T12:40:33.072Z"
+  },
+  {
+    "id": 1752669630539,
+    "date": "2025-07-16",
+    "materialType": "plasticBags",
+    "transactionType": "added",
+    "quantity": 20000,
+    "reference": "Manual addition",
+    "user": "AKAPP611",
+    "createdAt": "2025-07-16T12:40:30.539Z"
+  },
+  {
+    "id": 1752669629538,
+    "date": "2025-07-16",
+    "materialType": "plasticBags",
+    "transactionType": "added",
+    "quantity": 20000,
+    "reference": "Manual addition",
+    "user": "AKAPP611",
+    "createdAt": "2025-07-16T12:40:29.538Z"
+  },
+  {
+    "id": 1752568997577,
+    "date": "2025-07-15",
+    "materialType": "plasticBags",
+    "transactionType": "added",
+    "quantity": 10000,
+    "reference": "Manual addition",
+    "user": "AKAPP611",
+    "createdAt": "2025-07-15T08:43:17.577Z"
+  }
+]
