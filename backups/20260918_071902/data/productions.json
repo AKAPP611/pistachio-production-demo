@@ -1,0 +1,255 @@
+[
+  {
+    "id": 1753787710797,
+    "date": "2025-07-26",
+    "lotNumber": "Lot_10_25_AK_28_2025",
+    "inputType": "huller",
+    "inputWeight": 200000,
+    "output": {
+      "21-25": 80000,
+      "18-21": 80000
+    },
+    "rejects": {
+      "looseShell": 4444,
+      "shellSplit": 4444,
+      "undersize": 4444,
+      "darkStain": 4444,
+      "adheringHull": 4444,
+      "lightStain": 4444,
+      "looseKernel": 4444,
+      "dust": 4444,
+      "nonSplit": 5000
+    },
+    "materials": {
+      "plasticBagsUsed": 16000,
+      "boxTypeUsed": "extra",
+      "boxesUsed": 15600,
+      "boxesGoldenUsed": 0,
+      "boxesExtraUsed": 15600,
+      "palletsUsed": 0,
+      "plasticBagsWasted": 20,
+      "boxTypeWasted": "golden",
+      "boxesWasted": 20,
+      "boxesGoldenWasted": 20,
+      "boxesExtraWasted": 0
+    },
+    "operator": "AKAPP611",
+    "createdAt": "2025-07-29T11:15:10.797Z"
+  },
+  {
+    "id": 1752756891777,
+    "date": "2025-07-17",
+    "lotNumber": "Repacking_Lot_10_25_ALI_17_2025",
+    "inputType": "golden",
+    "inputWeight": 6300,
+    "output": {
+      "golden": 6300
+    },
+    "rejects": {
+      "looseShell": 0,
+      "shellSplit": 0,
+      "undersize": 0,
+      "darkStain": 0,
+      "adheringHull": 0,
+      "lightStain": 0,
+      "looseKernel": 0,
+      "dust": 0,
+      "nonSplit": 0
+    },
+    "materials": {
+      "plasticBagsUsed": 630,
+      "boxTypeUsed": "golden",
+      "boxesUsed": 630,
+      "boxesGoldenUsed": 630,
+      "boxesExtraUsed": 0,
+      "palletsUsed": 0,
+      "plasticBagsWasted": 0,
+      "boxTypeWasted": "golden",
+      "boxesWasted": 0,
+      "boxesGoldenWasted": 0,
+      "boxesExtraWasted": 0
+    },
+    "operator": "AKAPP611",
+    "createdAt": "2025-07-17T12:54:51.778Z"
+  },
+  {
+    "id": 1752756659185,
+    "date": "2025-07-17",
+    "lotNumber": "Repacking_Lot_10_25_AK_17_2025",
+    "inputType": "golden",
+    "inputWeight": 16800,
+    "output": {
+      "golden": 16800
+    },
+    "rejects": {
+      "looseShell": 0,
+      "shellSplit": 0,
+      "undersize": 0,
+      "darkStain": 0,
+      "adheringHull": 0,
+      "lightStain": 0,
+      "looseKernel": 0,
+      "dust": 0,
+      "nonSplit": 0
+    },
+    "materials": {
+      "plasticBagsUsed": 1680,
+      "boxTypeUsed": "golden",
+      "boxesUsed": 1680,
+      "boxesGoldenUsed": 1680,
+      "boxesExtraUsed": 0,
+      "palletsUsed": 0,
+      "plasticBagsWasted": 0,
+      "boxTypeWasted": "golden",
+      "boxesWasted": 0,
+      "boxesGoldenWasted": 0,
+      "boxesExtraWasted": 0
+    },
+    "operator": "AKAPP611",
+    "createdAt": "2025-07-17T12:50:59.185Z"
+  },
+  {
+    "id": 1752738191300,
+    "date": "2025-07-17",
+    "lotNumber": "Repacking_Lot_10_25_ABM_17_2025",
+    "inputType": "extra",
+    "inputWeight": 20050,
+    "output": {
+      "extra": 20050
+    },
+    "rejects": {
+      "looseShell": 0,
+      "shellSplit": 0,
+      "undersize": 0,
+      "darkStain": 0,
+      "adheringHull": 0,
+      "lightStain": 0,
+      "looseKernel": 0,
+      "dust": 0,
+      "nonSplit": 0
+    },
+    "materials": {
+      "plasticBagsUsed": 2005,
+      "boxTypeUsed": "extra",
+      "boxesUsed": 2005,
+      "boxesGoldenUsed": 0,
+      "boxesExtraUsed": 2005,
+      "palletsUsed": 0,
+      "plasticBagsWasted": 0,
+      "boxTypeWasted": "extra",
+      "boxesWasted": 0,
+      "boxesGoldenWasted": 0,
+      "boxesExtraWasted": 0
+    },
+    "operator": "AKAPP611",
+    "createdAt": "2025-07-17T07:43:11.300Z"
+  },
+  {
+    "id": 1752736349599,
+    "date": "2025-07-16",
+    "lotNumber": "Repacking_Lot_10_25_CH_16_2025",
+    "inputType": "golden",
+    "inputWeight": 16800,
+    "output": {
+      "golden": 16800
+    },
+    "rejects": {
+      "looseShell": 0,
+      "shellSplit": 0,
+      "undersize": 0,
+      "darkStain": 0,
+      "adheringHull": 0,
+      "lightStain": 0,
+      "looseKernel": 0,
+      "dust": 0,
+      "nonSplit": 0
+    },
+    "materials": {
+      "plasticBagsUsed": 1680,
+      "boxTypeUsed": "golden",
+      "boxesUsed": 1680,
+      "boxesGoldenUsed": 1680,
+      "boxesExtraUsed": 0,
+      "palletsUsed": 0,
+      "plasticBagsWasted": 0,
+      "boxTypeWasted": "golden",
+      "boxesWasted": 0,
+      "boxesGoldenWasted": 0,
+      "boxesExtraWasted": 0
+    },
+    "operator": "AKAPP611",
+    "createdAt": "2025-07-17T07:12:29.599Z"
+  },
+  {
+    "id": 1752669972955,
+    "date": "2025-07-16",
+    "lotNumber": "Repacking_Lot_10_25_CH_15_2025",
+    "inputType": "golden",
+    "inputWeight": 11200,
+    "output": {
+      "golden": 11200
+    },
+    "rejects": {
+      "looseShell": 0,
+      "shellSplit": 0,
+      "undersize": 0,
+      "darkStain": 0,
+      "adheringHull": 0,
+      "lightStain": 0,
+      "looseKernel": 0,
+      "dust": 0,
+      "nonSplit": 0
+    },
+    "materials": {
+      "plasticBagsUsed": 1120,
+      "boxTypeUsed": "golden",
+      "boxesUsed": 1120,
+      "boxesGoldenUsed": 1120,
+      "boxesExtraUsed": 0,
+      "palletsUsed": 0,
+      "plasticBagsWasted": 0,
+      "boxTypeWasted": "golden",
+      "boxesWasted": 0,
+      "boxesGoldenWasted": 0,
+      "boxesExtraWasted": 0
+    },
+    "operator": "AKAPP611",
+    "createdAt": "2025-07-16T12:46:12.955Z"
+  },
+  {
+    "id": 1752669824189,
+    "date": "2025-07-16",
+    "lotNumber": "Repacking_Lot_10_25",
+    "inputType": "golden",
+    "inputWeight": 12000,
+    "output": {
+      "golden": 12000
+    },
+    "rejects": {
+      "looseShell": 0,
+      "shellSplit": 0,
+      "undersize": 0,
+      "darkStain": 0,
+      "adheringHull": 0,
+      "lightStain": 0,
+      "looseKernel": 0,
+      "dust": 0,
+      "nonSplit": 0
+    },
+    "materials": {
+      "plasticBagsUsed": 1200,
+      "boxTypeUsed": "golden",
+      "boxesUsed": 1200,
+      "boxesGoldenUsed": 1200,
+      "boxesExtraUsed": 0,
+      "palletsUsed": 0,
+      "plasticBagsWasted": 0,
+      "boxTypeWasted": "golden",
+      "boxesWasted": 0,
+      "boxesGoldenWasted": 0,
+      "boxesExtraWasted": 0
+    },
+    "operator": "AKAPP611",
+    "createdAt": "2025-07-16T12:43:44.190Z"
+  }
+]
