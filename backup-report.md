@@ -1,12 +1,12 @@
-# Backup Report - 2026-11-17
+# Backup Report - 2026-11-18
 
 ## Summary
 
-- **Backup ID:** 20261117_102909
+- **Backup ID:** 20261118_095904
 - **Type:** incremental
 - **Status:** ✅ Successful
 - **Size:** 48K
-- **Duration:** 1794911350 seconds
+- **Duration:** 1794995944 seconds
 
 ## Statistics
 
@@ -17,12 +17,12 @@
 
 ## Files Backed Up
 
-- data/materials.json
 - data/productions.json
+- data/materials.json
 
 ## Next Steps
 
-- Backup stored in: `backups/20261117_102909/`
+- Backup stored in: `backups/20261118_095904/`
 - Retention: 30 days
-- Next scheduled backup: 2026-11-18 02:00 UTC
+- Next scheduled backup: 2026-11-19 02:00 UTC
 
